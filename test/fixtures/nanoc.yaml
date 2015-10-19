@@ -1,0 +1,51 @@
+
+data_variables:
+  -
+    scope:
+      path: ""
+    values:
+      version: "dotcom"
+
+page_variables:
+  -
+    scope:
+      path: ""
+    values:
+      version: "dotcom"
+      data_association: "categories.category"
+  -
+    scope:
+      path: "different"
+    values:
+      version: "2.0"
+
+string_pattern_type: glob
+
+text_extensions: [ 'coffee', 'css', 'erb', 'haml', 'handlebars', 'hb', 'htm', 'html', 'js', 'less', 'markdown', 'md', 'ms', 'mustache', 'php', 'rb', 'rdoc', 'sass', 'scss', 'slim', 'txt', 'xhtml', 'xml' ]
+
+output_dir: output
+
+index_filenames: [ 'index.html' ]
+
+enable_output_diff: false
+
+prune:
+  auto_prune: true
+
+  exclude: [ '.git', '.hg', '.svn', 'CVS' ]
+
+data_sources:
+  -
+    # The type is the identifier of the data source.
+    type: conref_fs
+
+    items_root: /
+    layouts_root: /
+
+    encoding: utf-8
+
+    identifier_type: full
+
+checks:
+  internal_links:
+    exclude: []

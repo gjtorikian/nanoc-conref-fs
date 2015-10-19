@@ -1,0 +1,14 @@
+product_name:
+  dotcom: 'GitHub'
+  '2.0': 'GitHub Enterprise'
+
+caveat: |
+  {% if page.version == 'dotcom' %}
+
+  No caveats!
+
+  {% else %}
+
+  Well.....there is one.
+
+  {% endif %}

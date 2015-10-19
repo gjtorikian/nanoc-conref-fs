@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+compile '/**/*.html' do
+  layout '/default.*'
+end
+
+compile '/**/*.md' do
+  layout '/default.*'
+end
+
+route '/**/*.md' do
+  item.identifier.without_ext + '/index.html'
+end
+
+route '/**/*.html}' do
+
+end
+
+route '/**/*' do
+  item.identifier.to_s
+end
+
+layout '/**/*', :erb

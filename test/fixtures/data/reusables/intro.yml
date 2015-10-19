@@ -1,0 +1,14 @@
+frontmatter_intro: Here I am, in the front.
+
+svn_intro: "We use {{ site.data.reusables.names.new_name }}"
+
+conditional_with_subs: |
+  {% if page.version == 'dotcom' %}
+
+  {{ site.data.variables.product.product_name }} is great for open source.
+
+  {% else %}
+
+  {{ site.data.variables.product.product_name }} is great for businesses.
+
+  {% endif %}
