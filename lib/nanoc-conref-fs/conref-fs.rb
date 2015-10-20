@@ -8,8 +8,10 @@ class ConrefFS < Nanoc::DataSource
   # Before iterating over the file objects, this method loads the data folder
   # and applies to to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
-    data = Datafiles.process(@site_config)
-    @vars = { 'site' => { 'config' => @site_config.to_h, 'data' => data } }
+    if klass == Nanoc::Int::Item && @vars.nil?
+      data = Datafiles.process(@site_config)
+      @vars = { 'site' => { 'config' => @site_config.to_h, 'data' => data } }
+    end
     super
   end
 
@@ -65,12 +67,15 @@ class ConrefFS < Nanoc::DataSource
       data = File.read(filename)
       return data unless filename.start_with?('content')
 
+      # we must obfuscate essential ExtendedMarkdownFilter content
+      data = data.gsub(/\{\{#/, '[[#').gsub(/\{\{ octicon-/, '[[ octicon-')
       # This first pass converts the frontmatter variables,
       # and inserts data variables into the body
       result = Conrefifier.apply_liquid(data, page_vars)
       # This second application renders the previously inserted
       # data conditionals within the body
       result = Conrefifier.apply_liquid(result, page_vars)
+      result.gsub('[[#', '{{#').gsub('{{ octicon-', '[[ octicon-')
     rescue => e
       raise RuntimeError.new("Could not read #{filename}: #{e.inspect}")
     end

@@ -6,6 +6,21 @@ The idea is that you have a set of YAML files in a data folder which act as your
 
 [![Build Status](https://travis-ci.org/gjtorikian/nanoc-conref-fs.svg)](https://travis-ci.org/gjtorikian/nanoc-conref-fs)
 
+**NOTE:** If you use this library with nanoc's ERB filter, and want to use `render`, you'll need to monkey-patch an alias to avoid conflicts:
+
+``` ruby
+require 'nanoc-conref-fs'
+include Nanoc::Helpers::Rendering
+Nanoc::Helpers::Rendering.module_eval do
+  if respond_to? :render
+    alias_method :renderp, :render
+    remove_method :render
+  end
+end
+```
+
+Then, use `renderp` instead of `render`.
+
 ## Usage
 
 Nearly all the usage of this gem relies on a *data* folder, sibling to your *content* and *layouts* folders. See [the test fixture](test/fixtures/data) for an example.
