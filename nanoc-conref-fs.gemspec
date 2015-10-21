@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'nanoc-conref-fs'
-  spec.version       = '0.1.1'
+  spec.version       = '0.2.0'
   spec.authors       = ['Garen Torikian']
   spec.email         = ['gjtorikian@gmail.com']
   spec.summary       = 'A Nanoc filesystem to permit using conrefs/reusables in your content.'
