@@ -77,3 +77,7 @@ See the tests for further usage of these conditionals. In both cases, `path` is 
 ### Associating files with data
 
 If you have a special `data_association` value, additional metadata to items will be applied. Right now, this only adds a `parent` type to each item.
+
+### Retrieving variables
+
+You can retrieve the stored data at any time (for example, in a layout) by calling `VariableMixin.variables`.
