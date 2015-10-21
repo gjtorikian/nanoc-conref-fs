@@ -97,4 +97,20 @@ class DatafilesTest < MiniTest::Test
       assert_equal output_file, test_file
     end
   end
+
+  def test_it_obfuscates_content
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      output_file = read_output_file('obfuscation', 'admonitions')
+      test_file = read_test_file('obfuscation', 'admonitions')
+      assert_equal output_file, test_file
+
+      output_file = read_output_file('obfuscation', 'octicon')
+      test_file = read_test_file('obfuscation', 'octicon')
+      assert_equal output_file, test_file
+    end
+  end
 end

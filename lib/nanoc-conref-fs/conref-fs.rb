@@ -68,14 +68,16 @@ class ConrefFS < Nanoc::DataSource
       return data unless filename.start_with?('content')
 
       # we must obfuscate essential ExtendedMarkdownFilter content
-      data = data.gsub(/\{\{#/, '[[#').gsub(/\{\{ octicon-/, '[[ octicon-')
+      data = data.gsub(/\{\{\s*#(\S+)\s*\}\}/, '[[#\1]]')
+      data = data.gsub(/\{\{\s*\/(\S+)\s*\}\}/, '[[/\1]]')
+      data = data.gsub(/\{\{\s*(octicon-\S+\s*[^\}]+)\s*\}\}/, '[[\1]]')
+
       # This first pass converts the frontmatter variables,
       # and inserts data variables into the body
       result = Conrefifier.apply_liquid(data, page_vars)
       # This second application renders the previously inserted
       # data conditionals within the body
       result = Conrefifier.apply_liquid(result, page_vars)
-      result.gsub('[[#', '{{#').gsub('{{ octicon-', '[[ octicon-')
     rescue => e
       raise RuntimeError.new("Could not read #{filename}: #{e.inspect}")
     end
