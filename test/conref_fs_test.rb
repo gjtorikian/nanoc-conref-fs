@@ -113,4 +113,15 @@ class DatafilesTest < MiniTest::Test
       assert_equal output_file, test_file
     end
   end
+
+  def test_it_fetches_variables
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+      output_file = read_output_file('datafiles', 'retrieve')
+      test_file = read_test_file('datafiles', 'retrieve')
+      assert_equal output_file, test_file
+    end
+  end
 end

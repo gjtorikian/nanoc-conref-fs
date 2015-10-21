@@ -1,18 +1,35 @@
 require_relative 'conrefifier'
 
+# Unsure why attr_accessor does not work here
+module VariableMixin
+  def self.variables
+    @variables
+  end
+
+  def self.variables=(variables)
+    @variables = variables
+  end
+end
+
 class ConrefFS < Nanoc::DataSource
   include Nanoc::DataSources::Filesystem
+  include VariableMixin
 
   identifier :conref_fs
 
   # Before iterating over the file objects, this method loads the data folder
   # and applies to to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
-    if klass == Nanoc::Int::Item && @vars.nil?
+    if klass == Nanoc::Int::Item && @variables.nil?
       data = Datafiles.process(@site_config)
-      @vars = { 'site' => { 'config' => @site_config.to_h, 'data' => data } }
+      @variables = { 'site' => { 'config' => @site_config.to_h, 'data' => data } }
+      VariableMixin.variables = @variables
     end
     super
+  end
+
+  def self.fetch_variables
+    @variables
   end
 
   # This function calls the parent super, then adds additional metadata to the item.
@@ -22,7 +39,7 @@ class ConrefFS < Nanoc::DataSource
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
       reference = association.split('.')
-      toc = @vars['site']['data']
+      toc = @variables['site']['data']
       while key = reference.shift
         toc = toc[key]
       end
@@ -62,7 +79,7 @@ class ConrefFS < Nanoc::DataSource
   def read(filename)
     begin
       page_vars = Conrefifier.file_variables(@site_config[:page_variables], filename)
-      page_vars = { :page => page_vars }.merge(@vars)
+      page_vars = { :page => page_vars }.merge(@variables)
 
       data = File.read(filename)
       return data unless filename.start_with?('content')

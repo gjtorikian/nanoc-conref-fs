@@ -5,8 +5,13 @@ compile '/**/*.html' do
 end
 
 compile '/**/*.md' do
-  layout '/default.*'
+  if item[:filename] =~ /retrieve/
+    layout '/retrieve.*'
+  else
+    layout '/default.*'
+  end
 end
+
 
 route '/**/*.md' do
   item.identifier.without_ext + '/index.html'
