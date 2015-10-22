@@ -82,7 +82,7 @@ class ConrefFS < Nanoc::DataSource
       page_vars = { :page => page_vars }.merge(@variables)
 
       data = File.read(filename)
-      return data unless filename.start_with?('content')
+      return data unless filename.start_with?('content', 'layouts')
 
       # we must obfuscate essential ExtendedMarkdownFilter content
       data = data.gsub(/\{\{\s*#(\S+)\s*\}\}/, '[[#\1]]')
