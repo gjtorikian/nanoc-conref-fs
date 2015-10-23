@@ -40,6 +40,8 @@ class ConrefFS < Nanoc::DataSource
         toc = toc[key]
       end
       meta['parents'] = find_parents(toc, meta['title'])
+    page_vars.each_pair do |name, value|
+      meta[name.to_s] = value
     end
     [meta, content]
   end
