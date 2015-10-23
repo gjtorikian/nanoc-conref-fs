@@ -148,4 +148,32 @@ class DatafilesTest < MiniTest::Test
       assert_equal output_file, test_file
     end
   end
+
+  def test_it_renders_hash_children
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      output_file = read_output_file('children', 'hash_children')
+      test_file = read_test_file('children', 'hash_children')
+      assert_equal output_file, test_file
+
+      output_file = read_output_file('children', 'later_hash_children')
+      test_file = read_test_file('children', 'later_hash_children')
+      assert_equal output_file, test_file
+    end
+  end
+
+  def test_it_renders_array_children
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      output_file = read_output_file('children', 'array_children')
+      test_file = read_test_file('children', 'array_children')
+      assert_equal output_file, test_file
+    end
+  end
 end

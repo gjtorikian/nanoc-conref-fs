@@ -1,0 +1,3 @@
+---
+title: Some other things
+---

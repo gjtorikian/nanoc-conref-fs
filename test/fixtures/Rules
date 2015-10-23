@@ -7,6 +7,8 @@ end
 compile '/**/*.md' do
   if item[:filename] =~ /retrieve/
     layout '/retrieve.*'
+  elsif item[:filename] =~ /_children/
+    layout '/children.*'
   else
     layout '/default.*'
   end

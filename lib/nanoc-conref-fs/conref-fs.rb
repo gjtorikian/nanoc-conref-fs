@@ -50,6 +50,12 @@ class ConrefFS < Nanoc::DataSource
                         else
                           find_hash_parents(toc, meta['title'])
                         end
+
+      meta['children'] = if toc.is_a?(Array)
+                           find_array_children(toc, meta['title'])
+                         else
+                           find_hash_children(toc, meta['title'])
+                         end
     end
     page_vars.each_pair do |name, value|
       meta[name.to_s] = value
@@ -95,6 +101,41 @@ class ConrefFS < Nanoc::DataSource
     end
     parents
   end
+
+
+    # Given a category file that's an array, this method finds
+    # the children of an item, probably a map topic
+    def find_array_children(toc, title)
+      children = ''
+      toc.each do |item|
+        next unless item.is_a?(Hash)
+        item.each_pair do |key, values|
+          if key == title
+            children = values.flatten
+            break
+          end
+        end
+        break unless children.empty?
+      end
+      children
+    end
+
+    # Given a category file that's a hash, this method finds
+    # the children of an item, probably a map topic
+    def find_hash_children(toc, title)
+      children = ''
+      toc.keys.each do |key|
+        toc[key].each do |item|
+          next unless item.is_a?(Hash)
+          unless item[title].nil?
+            children = item.values.flatten
+            break
+          end
+        end
+        break unless children.empty?
+      end
+      children
+    end
 
   # This file reads each piece of content as it comes in. It also applies the conref variables
   # (demarcated by Liquid's {{ }} tags) using both the data/ folder and any variables defined

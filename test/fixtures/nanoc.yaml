@@ -22,6 +22,12 @@ page_variables:
       data_association: "categories.simple"
   -
     scope:
+      path: "array_children"
+    values:
+      version: "dotcom"
+      data_association: "categories.simple"
+  -
+    scope:
       path: "different"
     values:
       version: "2.0"
