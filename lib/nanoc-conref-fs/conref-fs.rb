@@ -28,10 +28,6 @@ class ConrefFS < Nanoc::DataSource
     super
   end
 
-  def self.fetch_variables
-    @variables
-  end
-
   # This function calls the parent super, then adds additional metadata to the item.
   def parse(content_filename, meta_filename, _kind)
     meta, content = super
