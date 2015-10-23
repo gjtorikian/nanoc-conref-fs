@@ -76,8 +76,15 @@ See the tests for further usage of these conditionals. In both cases, `path` is 
 
 ### Associating files with data
 
-If you have a special `data_association` value, additional metadata to items will be applied. Right now, this only adds a `parent` type to each item.
+If you have a special `data_association` value, additional metadata to items will be applied:
+
+* An attribute called `:parents`, which adds the parent "map topic" to an item.
+* An attribute called `:children`, which adds any children of a "map topic."
 
 ### Retrieving variables
 
 You can retrieve the stored data at any time (for example, in a layout) by calling `VariableMixin.variables`.
+
+### Retrieving data files
+
+You can fetch anything in the *data* folder by passing in a string, demarcated with `.`s, to `VariableMixin.fetch_data_file`. For example, `VariableMixin.fetch_data_file('reusables.intro')` will fetch the file in *data/reusables/intro.yml*.
