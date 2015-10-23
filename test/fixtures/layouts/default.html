@@ -7,7 +7,7 @@
 </head>
 
 <body>
-
+  <% if @item[:title] =~ /Testing attributes/ %><%= @item[:just_a_key] %><% end %>
   <%= @item[:intro] %>
   <%= @item[:parents] %>
   <%= yield %>

@@ -9,6 +9,16 @@ module VariableMixin
   def self.variables=(variables)
     @variables = variables
   end
+
+  def self.fetch_data_file(association)
+    reference = association.split('.')
+    variables = VariableMixin.variables
+    data = variables['site']['data']
+    while key = reference.shift
+      data = data[key]
+    end
+    data
+  end
 end
 
 class ConrefFS < Nanoc::DataSource
@@ -34,20 +44,35 @@ class ConrefFS < Nanoc::DataSource
     page_vars = Conrefifier.file_variables(@site_config[:page_variables], content_filename)
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
-      reference = association.split('.')
-      toc = @variables['site']['data']
-      while key = reference.shift
-        toc = toc[key]
-      end
-      meta['parents'] = find_parents(toc, meta['title'])
+      toc = VariableMixin.fetch_data_file(association)
+      meta['parents'] = if toc.is_a?(Array)
+                          find_array_parents(toc, meta['title'])
+                        else
+                          find_hash_parents(toc, meta['title'])
+                        end
+    end
     page_vars.each_pair do |name, value|
       meta[name.to_s] = value
     end
     [meta, content]
   end
 
-  # Given a category file, this method finds its parent.
-  def find_parents(toc, title)
+  # Given a category file that's an array, this method finds
+  # the parent of an item
+  def find_array_parents(toc, title)
+    parents = ''
+    toc.each do |item|
+      if item.is_a?(Hash)
+        parents = find_hash_parents(item, title)
+        break unless parents.empty?
+      end
+    end
+    parents
+  end
+
+  # Given a category file that's a hash, this method finds
+  # the parent of an item
+  def find_hash_parents(toc, title)
     parents = ''
     toc.keys.each do |key|
       toc[key].each do |item|

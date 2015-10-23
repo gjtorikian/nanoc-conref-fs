@@ -13,6 +13,13 @@ page_variables:
     values:
       version: "dotcom"
       data_association: "categories.category"
+      just_a_key: wow!
+  -
+    scope:
+      path: "array_parents"
+    values:
+      version: "dotcom"
+      data_association: "categories.simple"
   -
     scope:
       path: "different"
