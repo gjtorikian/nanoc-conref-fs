@@ -31,8 +31,9 @@ class ConrefFS < Nanoc::DataSource
   # and applies to to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
     if klass == Nanoc::Int::Item && @variables.nil?
-      data = Datafiles.process(@site_config)
-      @variables = { 'site' => { 'config' => @site_config.to_h, 'data' => data } }
+      config = @site_config.to_h.stringify_keys
+      data = Datafiles.process(config)
+      @variables = { 'site' => { 'config' => config, 'data' => data } }
       VariableMixin.variables = @variables
     end
     super
@@ -42,16 +43,16 @@ class ConrefFS < Nanoc::DataSource
   def parse(content_filename, meta_filename, _kind)
     meta, content = super
     page_vars = Conrefifier.file_variables(@site_config[:page_variables], content_filename)
-    unless page_vars[:data_association].nil?
-      association = page_vars[:data_association]
+    unless page_vars['data_association'].nil?
+      association = page_vars['data_association']
       toc = VariableMixin.fetch_data_file(association)
-      meta['parents'] = if toc.is_a?(Array)
+      meta[:parents] = if toc.is_a?(Array)
                           find_array_parents(toc, meta['title'])
                         else
                           find_hash_parents(toc, meta['title'])
                         end
 
-      meta['children'] = if toc.is_a?(Array)
+      meta[:children] = if toc.is_a?(Array)
                            find_array_children(toc, meta['title'])
                          else
                            find_hash_children(toc, meta['title'])
@@ -143,7 +144,7 @@ class ConrefFS < Nanoc::DataSource
   def read(filename)
     begin
       page_vars = Conrefifier.file_variables(@site_config[:page_variables], filename)
-      page_vars = { :page => page_vars }.merge(@variables)
+      page_vars = { 'page' => page_vars }.merge(@variables)
 
       data = File.read(filename)
       return data unless filename.start_with?('content', 'layouts')

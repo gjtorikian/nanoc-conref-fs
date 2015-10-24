@@ -7,12 +7,12 @@ module Conrefifier
     data_vars = {}
     scopes = variables.select { |v| v[:scope][:path].empty? || Regexp.new(v[:scope][:path]) =~ path }
     scopes.each do |scope|
-      data_vars = data_vars.merge(scope[:values])
+      data_vars = data_vars.merge(scope[:values].stringify_keys)
     end
     data_vars
   end
 
   def self.apply_liquid(content, data_vars)
-    ::Liquid::Template.parse(content).render(data_vars.deep_stringify_keys)
+    ::Liquid::Template.parse(content).render(data_vars)
   end
 end
