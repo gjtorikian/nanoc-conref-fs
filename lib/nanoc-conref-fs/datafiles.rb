@@ -17,7 +17,12 @@ module Datafiles
 
     doc = YAML.load(content)
     data_keys = "#{path}".gsub(%r{^data/}, '').gsub(%r{/}, '.').gsub(/\.yml/, '').split('.')
-    create_nested_hash(data_keys, doc)
+    # we don't need to create a nested hash for root-level data files
+    if data_keys.length == 1
+      { data_keys.first => doc }
+    else
+      create_nested_hash(data_keys, doc)
+    end
   end
 
   def self.create_nested_hash(keys, final)
