@@ -6,6 +6,14 @@ The idea is that you have a set of YAML files in a data folder which act as your
 
 [![Build Status](https://travis-ci.org/gjtorikian/nanoc-conref-fs.svg)](https://travis-ci.org/gjtorikian/nanoc-conref-fs)
 
+Set the data source in your *nanoc.yaml* file:
+
+``` yml
+data_sources:
+  -
+    type: conref-fs
+```
+
 **NOTE:** If you use this library with nanoc's ERB filter, and want to use `render`, you'll need to monkey-patch an alias to avoid conflicts:
 
 ``` ruby
