@@ -25,7 +25,7 @@ class ConrefFS < Nanoc::DataSource
   include Nanoc::DataSources::Filesystem
   include VariableMixin
 
-  identifier :conref_fs
+  identifier :'conref-fs'
 
   # Before iterating over the file objects, this method loads the data folder
   # and applies to to an ivar for later usage.

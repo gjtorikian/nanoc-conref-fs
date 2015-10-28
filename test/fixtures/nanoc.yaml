@@ -50,7 +50,7 @@ prune:
 data_sources:
   -
     # The type is the identifier of the data source.
-    type: conref_fs
+    type: conref-fs
 
     items_root: /
     layouts_root: /
