@@ -176,4 +176,16 @@ class DatafilesTest < MiniTest::Test
       assert_equal output_file, test_file
     end
   end
+
+  def test_it_ignores_unknown_tags
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      output_file = read_output_file('maliciousness', 'unknown')
+      test_file = read_test_file('maliciousness', 'unknown')
+      assert_equal output_file, test_file
+    end
+  end
 end

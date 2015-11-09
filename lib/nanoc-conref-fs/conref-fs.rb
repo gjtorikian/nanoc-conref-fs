@@ -142,6 +142,7 @@ class ConrefFS < Nanoc::DataSource
   # (demarcated by Liquid's {{ }} tags) using both the data/ folder and any variables defined
   # within the nanoc.yaml config file
   def read(filename)
+    data = ''
     begin
       page_vars = Conrefifier.file_variables(@site_config[:page_variables], filename)
       page_vars = { 'page' => page_vars }.merge(@variables)
@@ -153,16 +154,26 @@ class ConrefFS < Nanoc::DataSource
       data = data.gsub(/\{\{\s*#(\S+)\s*\}\}/, '[[#\1]]')
       data = data.gsub(/\{\{\s*\/(\S+)\s*\}\}/, '[[/\1]]')
       data = data.gsub(/\{\{\s*(octicon-\S+\s*[^\}]+)\s*\}\}/, '[[\1]]')
+    rescue => e
+      raise "Could not read #{filename}: #{e.inspect}"
+    end
 
+    result = data
+
+    begin
       # This first pass converts the frontmatter variables,
       # and inserts data variables into the body
       result = Conrefifier.apply_liquid(data, page_vars)
       # This second application renders the previously inserted
       # data conditionals within the body
       result = Conrefifier.apply_liquid(result, page_vars)
+    rescue Liquid::SyntaxError
+      # unrecognized Liquid, so just return the content
     rescue => e
-      raise RuntimeError.new("Could not read #{filename}: #{e.inspect}")
+      raise "#{e.message}: #{e.inspect}"
     end
+
+    result
   end
 
   # This method is extracted from the Nanoc default FS
