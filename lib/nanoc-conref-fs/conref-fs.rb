@@ -159,16 +159,37 @@ class ConrefFS < Nanoc::DataSource
     end
 
     begin
-      content.gsub(/(\s\{\{[^\}]+\}\})/m) do |match|
-        # This first pass converts the frontmatter variables,
-        # and inserts data variables into the body
-        result = Conrefifier.apply_liquid(match, page_vars)
-        # This second application renders the previously inserted
-        # data conditionals within the body
-        Conrefifier.apply_liquid(result, page_vars)
+      result = ''
+      # This pass replaces any conditionals
+      result = if content =~ Conrefifier::BLOCK_SUB
+                  Conrefifier.apply_liquid(content, page_vars)
+               else
+                  content
+               end
+
+      # This pass converts the frontmatter variables,
+      # and inserts data variables into the body
+      result = if result =~ Conrefifier::SINGLE_SUB
+                result.gsub(Conrefifier::SINGLE_SUB) do |match|
+                  Conrefifier.apply_liquid(match, page_vars)
+                end
+               else
+                result
+               end
+
+      # This second pass renders any previously inserted
+      # data conditionals within the body
+      if result =~ Conrefifier::SINGLE_SUB
+        result = result.gsub(Conrefifier::SINGLE_SUB) do |match|
+          Conrefifier.apply_liquid(match, page_vars)
+        end
       end
-    rescue Liquid::SyntaxError
+
+      result
+    rescue Liquid::SyntaxError => e
       # unrecognized Liquid, so just return the content
+      # STDERR.puts "Could not convert #{filename}: #{e.message}"
+      result
     rescue => e
       raise "#{e.message}: #{e.inspect}"
     end
