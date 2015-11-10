@@ -31,8 +31,8 @@ class ConrefFS < Nanoc::DataSource
   # and applies to to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
     if klass == Nanoc::Int::Item && @variables.nil?
-      config = @site_config.to_h.stringify_keys
-      data = Datafiles.process(config)
+      data = Datafiles.process(@site_config)
+      config = @site_config.to_h
       @variables = { 'site' => { 'config' => config, 'data' => data } }
       VariableMixin.variables = @variables
     end
@@ -43,18 +43,18 @@ class ConrefFS < Nanoc::DataSource
   def parse(content_filename, meta_filename, _kind)
     meta, content = super
     page_vars = Conrefifier.file_variables(@site_config[:page_variables], content_filename)
-    unless page_vars['data_association'].nil?
-      association = page_vars['data_association']
+    unless page_vars[:data_association].nil?
+      association = page_vars[:data_association]
       toc = VariableMixin.fetch_data_file(association)
       meta[:parents] = if toc.is_a?(Array)
                           find_array_parents(toc, meta['title'])
-                        else
+                        elsif toc.is_a?(Hash)
                           find_hash_parents(toc, meta['title'])
                         end
 
       meta[:children] = if toc.is_a?(Array)
                            find_array_children(toc, meta['title'])
-                         else
+                         elsif toc.is_a?(Hash)
                            find_hash_children(toc, meta['title'])
                          end
     end
@@ -142,38 +142,36 @@ class ConrefFS < Nanoc::DataSource
   # (demarcated by Liquid's {{ }} tags) using both the data/ folder and any variables defined
   # within the nanoc.yaml config file
   def read(filename)
-    data = ''
+    content = ''
     begin
       page_vars = Conrefifier.file_variables(@site_config[:page_variables], filename)
-      page_vars = { 'page' => page_vars }.merge(@variables)
+      page_vars = { :page => page_vars }.merge(@variables)
 
-      data = File.read(filename)
-      return data unless filename.start_with?('content', 'layouts')
+      content = File.read(filename)
+      return content unless filename.start_with?('content', 'layouts')
 
       # we must obfuscate essential ExtendedMarkdownFilter content
-      data = data.gsub(/\{\{\s*#(\S+)\s*\}\}/, '[[#\1]]')
-      data = data.gsub(/\{\{\s*\/(\S+)\s*\}\}/, '[[/\1]]')
-      data = data.gsub(/\{\{\s*(octicon-\S+\s*[^\}]+)\s*\}\}/, '[[\1]]')
+      content = content.gsub(/\{\{\s*#(\S+)\s*\}\}/, '[[#\1]]')
+      content = content.gsub(/\{\{\s*\/(\S+)\s*\}\}/, '[[/\1]]')
+      content = content.gsub(/\{\{\s*(octicon-\S+\s*[^\}]+)\s*\}\}/, '[[\1]]')
     rescue => e
       raise "Could not read #{filename}: #{e.inspect}"
     end
 
-    result = data
-
     begin
-      # This first pass converts the frontmatter variables,
-      # and inserts data variables into the body
-      result = Conrefifier.apply_liquid(data, page_vars)
-      # This second application renders the previously inserted
-      # data conditionals within the body
-      result = Conrefifier.apply_liquid(result, page_vars)
+      content.gsub(/(\s\{\{[^\}]+\}\})/m) do |match|
+        # This first pass converts the frontmatter variables,
+        # and inserts data variables into the body
+        result = Conrefifier.apply_liquid(match, page_vars)
+        # This second application renders the previously inserted
+        # data conditionals within the body
+        Conrefifier.apply_liquid(result, page_vars)
+      end
     rescue Liquid::SyntaxError
       # unrecognized Liquid, so just return the content
     rescue => e
       raise "#{e.message}: #{e.inspect}"
     end
-
-    result
   end
 
   # This method is extracted from the Nanoc default FS

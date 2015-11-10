@@ -7,7 +7,8 @@ module Datafiles
 
   def self.apply_conditionals(config, path, content)
     data_vars = Conrefifier.file_variables(config[:data_variables], path)
-    data_vars = { 'page' => data_vars, 'site' => { 'config' => config } }
+    data_vars = { :page => data_vars, :site => { :config => config } }
+
     content = content.gsub(/(\s*\{% (?:if|unless).+? %\}.*?\{% end(?:if|unless) %\})/m) do |match|
       # We must obfuscate Liquid variables while replacing conditionals
       match = match.gsub(/{{/, '~~#~~')
