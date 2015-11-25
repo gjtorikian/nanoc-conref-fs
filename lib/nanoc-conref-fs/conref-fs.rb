@@ -168,13 +168,11 @@ class ConrefFS < Nanoc::DataSource
 
       # This pass converts the frontmatter variables,
       # and inserts data variables into the body
-      result = if result =~ Conrefifier::SINGLE_SUB
-                 result.gsub(Conrefifier::SINGLE_SUB) do |match|
-                   Conrefifier.apply_liquid(match, page_vars)
-                 end
-               else
-                 result
-               end
+      if result =~ Conrefifier::SINGLE_SUB
+        result = result.gsub(Conrefifier::SINGLE_SUB) do |match|
+          Conrefifier.apply_liquid(match, page_vars).chomp
+        end
+      end
 
       # This second pass renders any previously inserted
       # data conditionals within the body
