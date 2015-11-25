@@ -161,7 +161,9 @@ class ConrefFS < Nanoc::DataSource
       result = ''
       # This pass replaces any conditionals
       result = if content =~ Conrefifier::BLOCK_SUB
-                 Conrefifier.apply_liquid(content, page_vars)
+                 content.gsub(Conrefifier::BLOCK_SUB) do |match|
+                   Conrefifier.apply_liquid(match, page_vars).chomp
+                 end
                else
                  content
                end
