@@ -188,4 +188,28 @@ class DatafilesTest < MiniTest::Test
       assert_equal output_file, test_file
     end
   end
+
+  def test_it_works_if_an_asterisk_is_the_first_character
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      output_file = read_output_file('maliciousness', 'asterisk_single')
+      test_file = read_test_file('maliciousness', 'asterisk_single')
+      assert_equal output_file, test_file
+    end
+  end
+
+  def test_it_works_if_asterisks_are_the_first_two_characters
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      output_file = read_output_file('maliciousness', 'asterisk_double')
+      test_file = read_test_file('maliciousness', 'asterisk_double')
+      assert_equal output_file, test_file
+    end
+  end
 end

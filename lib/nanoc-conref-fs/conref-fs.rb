@@ -28,7 +28,7 @@ class ConrefFS < Nanoc::DataSource
   identifier :'conref-fs'
 
   # Before iterating over the file objects, this method loads the data folder
-  # and applies to to an ivar for later usage.
+  # and applies it to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
     if klass == Nanoc::Int::Item && @variables.nil?
       data = Datafiles.process(@site_config)
@@ -47,16 +47,16 @@ class ConrefFS < Nanoc::DataSource
       association = page_vars[:data_association]
       toc = VariableMixin.fetch_data_file(association)
       meta[:parents] = if toc.is_a?(Array)
-                          find_array_parents(toc, meta['title'])
-                        elsif toc.is_a?(Hash)
-                          find_hash_parents(toc, meta['title'])
-                        end
+                         find_array_parents(toc, meta['title'])
+                       elsif toc.is_a?(Hash)
+                         find_hash_parents(toc, meta['title'])
+                       end
 
       meta[:children] = if toc.is_a?(Array)
-                           find_array_children(toc, meta['title'])
-                         elsif toc.is_a?(Hash)
-                           find_hash_children(toc, meta['title'])
-                         end
+                          find_array_children(toc, meta['title'])
+                        elsif toc.is_a?(Hash)
+                          find_hash_children(toc, meta['title'])
+                        end
     end
     page_vars.each_pair do |name, value|
       meta[name.to_s] = value
@@ -102,7 +102,6 @@ class ConrefFS < Nanoc::DataSource
     end
     parents
   end
-
 
     # Given a category file that's an array, this method finds
     # the children of an item, probably a map topic
@@ -162,20 +161,28 @@ class ConrefFS < Nanoc::DataSource
       result = ''
       # This pass replaces any conditionals
       result = if content =~ Conrefifier::BLOCK_SUB
-                  Conrefifier.apply_liquid(content, page_vars)
+                 content.gsub(Conrefifier::BLOCK_SUB) do |match|
+                   Conrefifier.apply_liquid(match, page_vars).chomp
+                 end
                else
-                  content
+                 content
                end
 
       # This pass converts the frontmatter variables,
       # and inserts data variables into the body
-      result = if result =~ Conrefifier::SINGLE_SUB
-                result.gsub(Conrefifier::SINGLE_SUB) do |match|
-                  Conrefifier.apply_liquid(match, page_vars)
-                end
-               else
-                result
-               end
+      if result =~ Conrefifier::SINGLE_SUB
+        result = result.gsub(Conrefifier::SINGLE_SUB) do |match|
+          resolution = Conrefifier.apply_liquid(match, page_vars).strip
+          if resolution.start_with?('*')
+            if resolution[1] != '*'
+              resolution = resolution.sub(/\*(.+?)\*/, '<em>\1</em>')
+            else
+              resolution = resolution.sub(/\*{2}(.+?)\*{2}/, '<strong>\1</strong>')
+            end
+          end
+          resolution
+        end
+      end
 
       # This second pass renders any previously inserted
       # data conditionals within the body
@@ -186,7 +193,7 @@ class ConrefFS < Nanoc::DataSource
       end
 
       result
-    rescue Liquid::SyntaxError => e
+    rescue Liquid::SyntaxError
       # unrecognized Liquid, so just return the content
       # STDERR.puts "Could not convert #{filename}: #{e.message}"
       result

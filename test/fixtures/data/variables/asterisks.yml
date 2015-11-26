@@ -1,0 +1,5 @@
+about-two-factor-authentication: |
+  *Two-factor authentication*, or 2FA, is a way of logging into websites that requires more than just a password. Using a password to log into a website is susceptible to security threats, because it represents a _single_ piece of information a malicious person needs to acquire. The added security that 2FA provides is requiring _additional information_ to sign in.
+
+about-two-factor-authentication-strong: |
+  **Two-factor authentication**, or 2FA, is a way of logging into websites that requires more than just a password. Using a password to log into a website is susceptible to security threats, because it represents a _single_ piece of information a malicious person needs to acquire. The added security that 2FA provides is requiring _additional information_ to sign in.
