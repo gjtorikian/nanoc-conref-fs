@@ -172,7 +172,15 @@ class ConrefFS < Nanoc::DataSource
       # and inserts data variables into the body
       if result =~ Conrefifier::SINGLE_SUB
         result = result.gsub(Conrefifier::SINGLE_SUB) do |match|
-          Conrefifier.apply_liquid(match, page_vars).chomp
+          resolution = Conrefifier.apply_liquid(match, page_vars).strip
+          if resolution.start_with?('*')
+            if resolution[1] != '*'
+              resolution = resolution.sub(/\*(.+?)\*/, '<em>\1</em>')
+            else
+              resolution = resolution.sub(/\*{2}(.+?)\*{2}/, '<strong>\1</strong>')
+            end
+          end
+          resolution
         end
       end
 

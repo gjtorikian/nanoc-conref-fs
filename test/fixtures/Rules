@@ -9,18 +9,15 @@ compile '/**/*.md' do
     layout '/retrieve.*'
   elsif item[:filename] =~ /_children/
     layout '/children.*'
+  elsif item[:filename] =~ /asterisk/
+    layout '/asterisk.*'
   else
     layout '/default.*'
   end
 end
 
-
 route '/**/*.md' do
   item.identifier.without_ext + '/index.html'
-end
-
-route '/**/*.html}' do
-
 end
 
 route '/**/*' do
