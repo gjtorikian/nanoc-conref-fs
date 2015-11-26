@@ -6,7 +6,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_collects_the_files
-    files = Datafiles.collect_data(File.join(FIXTURES_DIR, 'data'))
+    files = Datafiles.collect_data(File.join(FIXTURES_DIR, 'data')).sort
     names = %w(categories/category categories/simple reusables/intro reusables/names variables/asterisks variables/empty variables/product)
     names.map! { |name| File.join(FIXTURES_DIR, 'data', "#{name}.yml") }
     assert_equal files, names
