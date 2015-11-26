@@ -1,11 +1,9 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-require 'nanoc-conref-fs/version'
-
 Gem::Specification.new do |spec|
   spec.name          = 'nanoc-conref-fs'
-  spec.version       = Conrefifier::VERSION
+  spec.version       = '0.4.4'
   spec.authors       = ['Garen Torikian']
   spec.email         = ['gjtorikian@gmail.com']
   spec.summary       = 'A Nanoc filesystem to permit using conrefs/reusables in your content.'
