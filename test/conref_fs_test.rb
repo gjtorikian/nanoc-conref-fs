@@ -212,4 +212,30 @@ class DatafilesTest < MiniTest::Test
       assert_equal output_file, test_file
     end
   end
+
+  def test_raw_tags
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      output_file = read_output_file('liquid', 'raw')
+      test_file = read_test_file('liquid', 'raw')
+
+      assert_equal output_file, test_file
+    end
+  end
+
+  def test_multiple_version_blocks
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      output_file = read_output_file('liquid', 'multiple_versions')
+      test_file = read_test_file('liquid', 'multiple_versions')
+
+      assert_equal output_file, test_file
+    end
+  end
 end

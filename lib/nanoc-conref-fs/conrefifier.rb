@@ -18,6 +18,6 @@ module Conrefifier
 
   def self.apply_liquid(content, data_vars)
     data_vars['page'] = data_vars[:page].stringify_keys
-    ::Liquid::Template.parse(content).render(data_vars)
+    Liquid::Template.parse(content, :error_mode => :warn).render(data_vars)
   end
 end

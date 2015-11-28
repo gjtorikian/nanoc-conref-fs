@@ -158,44 +158,41 @@ class ConrefFS < Nanoc::DataSource
     end
 
     begin
-      result = ''
-      # This pass replaces any conditionals
-      result = if content =~ Conrefifier::BLOCK_SUB
-                 content.gsub(Conrefifier::BLOCK_SUB) do |match|
-                   Conrefifier.apply_liquid(match, page_vars).chomp
-                 end
-               else
-                 content
-               end
+      result = content
 
-      # This pass converts the frontmatter variables,
-      # and inserts data variables into the body
-      if result =~ Conrefifier::SINGLE_SUB
-        result = result.gsub(Conrefifier::SINGLE_SUB) do |match|
-          resolution = Conrefifier.apply_liquid(match, page_vars).strip
-          if resolution.start_with?('*')
-            if resolution[1] != '*'
-              resolution = resolution.sub(/\*(.+?)\*/, '<em>\1</em>')
-            else
-              resolution = resolution.sub(/\*{2}(.+?)\*{2}/, '<strong>\1</strong>')
-            end
-          end
-          resolution
-        end
+      # This pass replaces any matched conditionals
+      if result =~ Conrefifier::BLOCK_SUB || result =~ Conrefifier::SINGLE_SUB
+        result = Conrefifier.apply_liquid(result, page_vars)
       end
 
       # This second pass renders any previously inserted
-      # data conditionals within the body
+      # data conditionals within the body. If a Liquid parse
+      # returns a blank string, we'll return the original
       if result =~ Conrefifier::SINGLE_SUB
         result = result.gsub(Conrefifier::SINGLE_SUB) do |match|
-          Conrefifier.apply_liquid(match, page_vars)
+          liquified = Conrefifier.apply_liquid(match, page_vars)
+          liquified.empty? ? match : liquified
+        end
+      end
+
+      # This converts ": *" frontmatter strings into HTML equivalents;
+      # otherwise, ": *" messes the YAML parsing
+      result = result.gsub(/\A---\s*\n(.*?\n?)^---\s*$\n?/m) do |frontmatter|
+        frontmatter.gsub(/:\s*(\*.+)/) do |_|
+          asterisk_match = Regexp.last_match[1]
+          if asterisk_match[1] != '*'
+            asterisk_match = asterisk_match.sub(/\*(.+?)\*/, ': <em>\1</em>')
+          else
+            asterisk_match = asterisk_match.sub(/\*{2}(.+?)\*{2}/, ': <strong>\1</strong>')
+          end
+          asterisk_match
         end
       end
 
       result
-    rescue Liquid::SyntaxError
+    rescue Liquid::SyntaxError => e
       # unrecognized Liquid, so just return the content
-      # STDERR.puts "Could not convert #{filename}: #{e.message}"
+      STDERR.puts "Could not convert #{filename}: #{e.message}"
       result
     rescue => e
       raise "#{e.message}: #{e.inspect}"

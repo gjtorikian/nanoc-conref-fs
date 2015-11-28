@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>
+  Raw
+  </title>
+</head>
+
+<body>
+
+For example, to list a project's name, you might write something like `The project is called {{ site.github.project_title }}` or to list an organization's open source repositories, you might use the following:
+
+``` liquid
+{% for repository in site.github.public_repositories %}
+  * [{{ repository.name }}]({{ repository.html_url }})
+{% endfor %}
+```
+
+</body>
+</html>

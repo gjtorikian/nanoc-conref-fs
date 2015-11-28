@@ -31,6 +31,11 @@ page_variables:
       path: "different"
     values:
       version: "2.0"
+  -
+    scope:
+      path: "multiple_versions"
+    values:
+      version: 2.2
 
 string_pattern_type: glob
 
