@@ -1,7 +1,6 @@
 require 'liquid'
 
 module Conrefifier
-
   SINGLE_SUB = /(\{\{[^\}]+\}\})/m
   BLOCK_SUB = /\{% (?:if|unless).+? %\}.*?\{% end(?:if|unless) %\}/m
 

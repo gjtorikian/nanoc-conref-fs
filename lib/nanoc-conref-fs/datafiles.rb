@@ -4,17 +4,11 @@ require 'active_support/core_ext/hash'
 require_relative 'conrefifier'
 
 module Datafiles
-
   def self.apply_conditionals(config, path, content)
     data_vars = Conrefifier.file_variables(config[:data_variables], path)
     data_vars = { :page => data_vars, :site => { :config => config } }
 
-    content = content.gsub(Conrefifier::BLOCK_SUB) do |match|
-      # We must obfuscate Liquid variables while replacing conditionals
-      match = match.gsub(/{{/, '~~#~~')
-      match = Conrefifier.apply_liquid(match, data_vars)
-      match.gsub('~~#~~', '{{')
-    end
+    content = obfuscate_liquid(content, data_vars)
 
     doc = YAML.load(content)
     data_keys = "#{path}".gsub(%r{^data/}, '').gsub(%r{/}, '.').gsub(/\.yml/, '').split('.')
@@ -36,6 +30,8 @@ module Datafiles
     end
   end
 
+  private
+
   def self.collect_data(dir)
     Dir["#{dir}/**/*.{yaml,yml}"]
   end
@@ -48,5 +44,14 @@ module Datafiles
       data = data.deep_merge apply_conditionals(config, file, content)
     end
     data
+  end
+
+  def self.obfuscate_liquid(content, data_vars)
+    content.gsub(Conrefifier::BLOCK_SUB) do |match|
+      # We must obfuscate Liquid variables while replacing conditionals
+      match = match.gsub(/{{/, '~~#~~')
+      match = Conrefifier.apply_liquid(match, data_vars)
+      match.gsub('~~#~~', '{{')
+    end
   end
 end

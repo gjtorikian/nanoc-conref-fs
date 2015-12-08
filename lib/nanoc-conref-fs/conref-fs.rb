@@ -12,8 +12,7 @@ module VariableMixin
 
   def self.fetch_data_file(association)
     reference = association.split('.')
-    variables = VariableMixin.variables
-    data = variables['site']['data']
+    data = VariableMixin.variables['site']['data']
     while key = reference.shift
       data = data[key]
     end
@@ -43,25 +42,35 @@ class ConrefFS < Nanoc::DataSource
   def parse(content_filename, meta_filename, _kind)
     meta, content = super
     page_vars = Conrefifier.file_variables(@site_config[:page_variables], content_filename)
+
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
       toc = VariableMixin.fetch_data_file(association)
-      meta[:parents] = if toc.is_a?(Array)
-                         find_array_parents(toc, meta['title'])
-                       elsif toc.is_a?(Hash)
-                         find_hash_parents(toc, meta['title'])
-                       end
-
-      meta[:children] = if toc.is_a?(Array)
-                          find_array_children(toc, meta['title'])
-                        elsif toc.is_a?(Hash)
-                          find_hash_children(toc, meta['title'])
-                        end
+      meta[:parents] = create_parents(toc, meta)
+      meta[:children] = create_children(toc, meta)
     end
+
     page_vars.each_pair do |name, value|
       meta[name.to_s] = value
     end
+
     [meta, content]
+  end
+
+  def create_parents(toc, meta)
+    if toc.is_a?(Array)
+      find_array_parents(toc, meta['title'])
+    elsif toc.is_a?(Hash)
+      find_hash_parents(toc, meta['title'])
+    end
+  end
+
+  def create_children(toc, meta)
+    if toc.is_a?(Array)
+      find_array_children(toc, meta['title'])
+    elsif toc.is_a?(Hash)
+      find_hash_children(toc, meta['title'])
+    end
   end
 
   # Given a category file that's an array, this method finds
