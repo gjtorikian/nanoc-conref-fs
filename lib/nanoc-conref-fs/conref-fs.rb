@@ -16,8 +16,12 @@ class ConrefFS < Nanoc::DataSource
     super
   end
 
+  def data_dir_name
+    config.fetch(:data_dir, 'data')
+  end
+
   def load_data_folder
-    data = NanocConrefFS::Datafiles.process(@site_config)
+    @data_files = NanocConrefFS::Datafiles.collect_data(data_dir_name)
     NanocConrefFS::Variables.data_files = @data_files
     data = NanocConrefFS::Datafiles.process(@data_files, @site_config)
     config = @site_config.to_h
