@@ -1,28 +1,8 @@
 require_relative 'conrefifier'
 
-# Unsure why attr_accessor does not work here
-module VariableMixin
-  def self.variables
-    @variables
-  end
-
-  def self.variables=(variables)
-    @variables = variables
-  end
-
-  def self.fetch_data_file(association)
-    reference = association.split('.')
-    data = VariableMixin.variables['site']['data']
-    while key = reference.shift
-      data = data[key]
-    end
-    data
-  end
-end
-
 class ConrefFS < Nanoc::DataSource
   include Nanoc::DataSources::Filesystem
-  include VariableMixin
+  include NanocConrefFS::Variables
   include NanocConrefFS::Ancestry
 
   identifier :'conref-fs'
@@ -38,9 +18,11 @@ class ConrefFS < Nanoc::DataSource
 
   def load_data_folder
     data = NanocConrefFS::Datafiles.process(@site_config)
+    NanocConrefFS::Variables.data_files = @data_files
+    data = NanocConrefFS::Datafiles.process(@data_files, @site_config)
     config = @site_config.to_h
     @variables = { 'site' => { 'config' => config, 'data' => data } }
-    VariableMixin.variables = @variables
+    NanocConrefFS::Variables.variables = @variables
   end
 
   # This function calls the parent super, then adds additional metadata to the item.
@@ -55,7 +37,7 @@ class ConrefFS < Nanoc::DataSource
 
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
-      toc = VariableMixin.fetch_data_file(association)
+      toc = NanocConrefFS::Variables.fetch_data_file(association)
       meta[:parents] = create_parents(toc, meta)
       meta[:children] = create_children(toc, meta)
     end

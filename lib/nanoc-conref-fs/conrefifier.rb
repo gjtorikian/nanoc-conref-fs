@@ -18,7 +18,7 @@ module NanocConrefFS
 
     def self.liquify(filename, content, config)
       page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], filename)
-      page_vars = { :page => page_vars }.merge(VariableMixin.variables)
+      page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables)
 
       # we must obfuscate essential ExtendedMarkdownFilter content
       content = content.gsub(/\{\{\s*#(\S+)\s*\}\}/, '[[#\1]]')
