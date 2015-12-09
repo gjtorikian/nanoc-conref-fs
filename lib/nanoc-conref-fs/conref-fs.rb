@@ -44,6 +44,11 @@ class ConrefFS < Nanoc::DataSource
   # This function calls the parent super, then adds additional metadata to the item.
   def parse(content_filename, meta_filename, _kind)
     meta, content = super
+    apply_attributes(meta, content_filename)
+    [meta, content]
+  end
+
+  def apply_attributes(meta, content_filename)
     page_vars = Conrefifier.file_variables(@site_config[:page_variables], content_filename)
 
     unless page_vars[:data_association].nil?
