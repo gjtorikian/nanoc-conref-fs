@@ -34,15 +34,17 @@ module NanocConrefFS
     private
 
     def self.collect_data(dir)
-      Dir["#{dir}/**/*.{yaml,yml}"]
+      data_files = {}
+      Dir["#{dir}/**/*.{yaml,yml}"].each do |filename|
+        data_files[filename] = File.read(filename)
+      end
+      data_files
     end
 
-    def self.process(config)
+    def self.process(data_files, config)
       data = {}
-      files = collect_data('data')
-      files.each do |file|
-        content = File.read(file)
-        data = data.deep_merge apply_conditionals(config, file, content)
+      data_files.each_pair do |filename, content|
+        data = data.deep_merge apply_conditionals(config, filename, content)
       end
       data
     end
