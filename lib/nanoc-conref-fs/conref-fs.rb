@@ -30,13 +30,15 @@ class ConrefFS < Nanoc::DataSource
   # Before iterating over the file objects, this method loads the data folder
   # and applies it to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
-    if klass == Nanoc::Int::Item && @variables.nil?
-      data = Datafiles.process(@site_config)
-      config = @site_config.to_h
-      @variables = { 'site' => { 'config' => config, 'data' => data } }
-      VariableMixin.variables = @variables
-    end
+    load_data_folder if klass == Nanoc::Int::Item && @variables.nil?
     super
+  end
+
+  def load_data_folder
+    data = Datafiles.process(@site_config)
+    config = @site_config.to_h
+    @variables = { 'site' => { 'config' => config, 'data' => data } }
+    VariableMixin.variables = @variables
   end
 
   # This function calls the parent super, then adds additional metadata to the item.
