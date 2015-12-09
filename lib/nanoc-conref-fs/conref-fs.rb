@@ -37,7 +37,7 @@ class ConrefFS < Nanoc::DataSource
   end
 
   def load_data_folder
-    data = Datafiles.process(@site_config)
+    data = NanocConrefFS::Datafiles.process(@site_config)
     config = @site_config.to_h
     @variables = { 'site' => { 'config' => config, 'data' => data } }
     VariableMixin.variables = @variables
@@ -51,7 +51,7 @@ class ConrefFS < Nanoc::DataSource
   end
 
   def apply_attributes(meta, content_filename)
-    page_vars = Conrefifier.file_variables(@site_config[:page_variables], content_filename)
+    page_vars = NanocConrefFS::Conrefifier.file_variables(@site_config[:page_variables], content_filename)
 
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
@@ -74,7 +74,7 @@ class ConrefFS < Nanoc::DataSource
     content = super
     return content unless filename.start_with?('content', 'layouts')
     @unparsed_content = content
-    Conrefifier.liquify(filename, content, @site_config)
+    NanocConrefFS::Conrefifier.liquify(filename, content, @site_config)
   end
 
   # This method is extracted from the Nanoc default FS
