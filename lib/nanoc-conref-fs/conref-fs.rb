@@ -27,6 +27,8 @@ class ConrefFS < Nanoc::DataSource
 
   identifier :'conref-fs'
 
+  attr_reader :unparsed_content
+
   # Before iterating over the file objects, this method loads the data folder
   # and applies it to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
@@ -57,6 +59,8 @@ class ConrefFS < Nanoc::DataSource
       meta[:parents] = create_parents(toc, meta)
       meta[:children] = create_children(toc, meta)
     end
+
+    meta[:unparsed_content] = @unparsed_content
 
     page_vars.each_pair do |name, value|
       meta[name.to_s] = value
