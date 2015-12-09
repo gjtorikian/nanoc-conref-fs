@@ -54,72 +54,16 @@ class ConrefFS < Nanoc::DataSource
     page_vars.each_pair do |name, value|
       meta[name.to_s] = value
     end
-
-    [meta, content]
-  end
-
   end
 
   # This file reads each piece of content as it comes in. It also applies the conref variables
   # (demarcated by Liquid's {{ }} tags) using both the data/ folder and any variables defined
   # within the nanoc.yaml config file
   def read(filename)
-    content = ''
-    begin
-      page_vars = Conrefifier.file_variables(@site_config[:page_variables], filename)
-      page_vars = { :page => page_vars }.merge(@variables)
-
-      content = File.read(filename)
-      return content unless filename.start_with?('content', 'layouts')
-
-      # we must obfuscate essential ExtendedMarkdownFilter content
-      content = content.gsub(/\{\{\s*#(\S+)\s*\}\}/, '[[#\1]]')
-      content = content.gsub(/\{\{\s*\/(\S+)\s*\}\}/, '[[/\1]]')
-      content = content.gsub(/\{\{\s*(octicon-\S+\s*[^\}]+)\s*\}\}/, '[[\1]]')
-    rescue => e
-      raise "Could not read #{filename}: #{e.inspect}"
-    end
-
-    begin
-      result = content
-
-      # This pass replaces any matched conditionals
-      if result =~ Conrefifier::BLOCK_SUB || result =~ Conrefifier::SINGLE_SUB
-        result = Conrefifier.apply_liquid(result, page_vars)
-      end
-
-      # This second pass renders any previously inserted
-      # data conditionals within the body. If a Liquid parse
-      # returns a blank string, we'll return the original
-      if result =~ Conrefifier::SINGLE_SUB
-        result = result.gsub(Conrefifier::SINGLE_SUB) do |match|
-          liquified = Conrefifier.apply_liquid(match, page_vars)
-          liquified.empty? ? match : liquified
-        end
-      end
-
-      # This converts ": *" frontmatter strings into HTML equivalents;
-      # otherwise, ": *" messes the YAML parsing
-      result = result.gsub(/\A---\s*\n(.*?\n?)^---\s*$\n?/m) do |frontmatter|
-        frontmatter.gsub(/:\s*(\*.+)/) do |_|
-          asterisk_match = Regexp.last_match[1]
-          if asterisk_match[1] != '*'
-            asterisk_match = asterisk_match.sub(/\*(.+?)\*/, ': <em>\1</em>')
-          else
-            asterisk_match = asterisk_match.sub(/\*{2}(.+?)\*{2}/, ': <strong>\1</strong>')
-          end
-          asterisk_match
-        end
-      end
-
-      result
-    rescue Liquid::SyntaxError => e
-      # unrecognized Liquid, so just return the content
-      STDERR.puts "Could not convert #{filename}: #{e.message}"
-      result
-    rescue => e
-      raise "#{e.message}: #{e.inspect}"
-    end
+    content = super
+    return content unless filename.start_with?('content', 'layouts')
+    @unparsed_content = content
+    Conrefifier.liquify(filename, content, @site_config)
   end
 
   # This method is extracted from the Nanoc default FS
