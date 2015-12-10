@@ -7,6 +7,11 @@ require 'active_support'
 
 FIXTURES_DIR = File.join(Dir.pwd, 'test', 'fixtures')
 
+class Minitest::Test
+  FileUtils.rm_rf File.join(FIXTURES_DIR, 'output')
+  FileUtils.rm_rf File.join(FIXTURES_DIR, 'tmp')
+end
+
 def read_output_file(dir, name)
   File.read(File.join('output', dir, name, 'index.html')).gsub(/^\s*$/, '')
 end
