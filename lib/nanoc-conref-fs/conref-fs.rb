@@ -29,13 +29,6 @@ class ConrefFS < Nanoc::DataSource
     NanocConrefFS::Variables.variables = @variables
   end
 
-  # This function calls the parent super, then adds additional metadata to the item.
-  def parse(content_filename, meta_filename, _kind)
-    meta, content = super
-    apply_attributes(meta, content_filename)
-    [meta, content]
-  end
-
   def apply_attributes(meta, content_filename)
     page_vars = NanocConrefFS::Conrefifier.file_variables(@site_config[:page_variables], content_filename)
 
@@ -58,9 +51,13 @@ class ConrefFS < Nanoc::DataSource
   # within the nanoc.yaml config file
   def read(filename)
     content = super
-    return content unless filename.start_with?('content', 'layouts')
-    @unparsed_content = content
-    NanocConrefFS::Conrefifier.liquify(filename, content, @site_config)
+    content = content.gsub(/\A---\s*\n(.*?\n?)^---\s*$\n?/m) do |frontmatter|
+      frontmatter.gsub(/:\s*(\{\{.+)/) do |_|
+        curly_match = Regexp.last_match[1]
+        ": '#{curly_match}'"
+      end
+    end
+    content
   end
 
   # This method is extracted from the Nanoc default FS
