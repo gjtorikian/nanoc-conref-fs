@@ -48,6 +48,12 @@ module NanocConrefFS
       rescue => e
         raise "#{e.message}: #{e.inspect}"
       end
+
+      result = result.gsub(/\[\[\s*#(\S+)\s*\]\]/, '{{#\1}}')
+      result = result.gsub(/\[\[\s*\/(\S+)\s*\]\]/, '{{/\1}}')
+      result = result.gsub(/\[\[\s*(octicon-\S+\s*[^\]]+)\s*\]\]/, '{{\1}}')
+
+      result
     end
 
     def self.apply_liquid(content, data_vars)

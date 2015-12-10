@@ -74,7 +74,7 @@ class DatafilesTest < MiniTest::Test
     end
   end
 
-  def test_it_obfuscates_content
+  def test_it_does_not_obfuscate_content
     with_site(name: FIXTURES_DIR) do |site|
 
       site = Nanoc::Int::SiteLoader.new.new_from_cwd
