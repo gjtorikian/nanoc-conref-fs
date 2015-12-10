@@ -27,6 +27,23 @@ route '/**/*.md' do
   item.identifier.without_ext + '/index.html'
 end
 
+# compile '/**/*.md', :rep => :cloud do
+#   # NanocConrefFS::Conrefifier.liquify(@item.raw_filename, @item[:unparsed_content], @config)
+#   if item[:filename] =~ /retrieve/
+#     layout '/retrieve.*'
+#   elsif item[:filename] =~ /_children/
+#     layout '/children.*'
+#   elsif item[:filename] =~ /asterisk/
+#     layout '/asterisk.*'
+#   else
+#     layout '/default.*'
+#   end
+# end
+
+# route '/**/*.md', :rep => :cloud do
+#   item.identifier.without_ext + '/cloud/index.html'
+# end
+
 route '/**/*' do
   item.identifier.to_s
 end
