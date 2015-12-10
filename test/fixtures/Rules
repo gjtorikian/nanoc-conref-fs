@@ -14,6 +14,7 @@ compile '/**/*.md' do
   else
     layout '/default.*'
   end
+  filter :'conref-fs-filter'
 end
 
 route '/**/*.md' do

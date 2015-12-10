@@ -29,20 +29,20 @@ class ConrefFS < Nanoc::DataSource
     NanocConrefFS::Variables.variables = @variables
   end
 
-  def apply_attributes(meta, content_filename)
-    page_vars = NanocConrefFS::Conrefifier.file_variables(@site_config[:page_variables], content_filename)
+  def self.apply_attributes(config, item)
+    page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename])
 
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
       toc = NanocConrefFS::Variables.fetch_data_file(association)
-      meta[:parents] = create_parents(toc, meta)
-      meta[:children] = create_children(toc, meta)
+      item[:parents] = NanocConrefFS::Ancestry::create_parents(toc, item.attributes)
+      item[:children] = NanocConrefFS::Ancestry::create_children(toc, item.attributes)
     end
 
-    meta[:unparsed_content] = @unparsed_content
+    # item[:unparsed_content] = @unparsed_content
 
-    page_vars.each_pair do |name, value|
-      meta[name.to_s] = value
+    page_vars.each_pair do |key, value|
+      item[key] = value
     end
   end
 
