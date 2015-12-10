@@ -1,21 +1,22 @@
 module NanocConrefFS
   module Ancestry
-
     def create_parents(toc, meta)
       if toc.is_a?(Array)
-        find_array_parents(toc, meta['title'])
+        find_array_parents(toc, meta[:title])
       elsif toc.is_a?(Hash)
-        find_hash_parents(toc, meta['title'])
+        find_hash_parents(toc, meta[:title])
       end
     end
+    module_function :create_parents
 
     def create_children(toc, meta)
       if toc.is_a?(Array)
-        find_array_children(toc, meta['title'])
+        find_array_children(toc, meta[:title])
       elsif toc.is_a?(Hash)
-        find_hash_children(toc, meta['title'])
+        find_hash_children(toc, meta[:title])
       end
     end
+    module_function :create_children
 
     # Given a category file that's an array, this method finds
     # the parent of an item
@@ -29,6 +30,7 @@ module NanocConrefFS
       end
       parents
     end
+    module_function :find_array_parents
 
     # Given a category file that's a hash, this method finds
     # the parent of an item
@@ -55,6 +57,7 @@ module NanocConrefFS
       end
       parents
     end
+    module_function :find_hash_parents
 
     # Given a category file that's an array, this method finds
     # the children of an item, probably a map topic
@@ -72,6 +75,7 @@ module NanocConrefFS
       end
       children
     end
+    module_function :find_array_children
 
     # Given a category file that's a hash, this method finds
     # the children of an item, probably a map topic
@@ -89,5 +93,6 @@ module NanocConrefFS
       end
       children
     end
+    module_function :find_hash_children
   end
 end
