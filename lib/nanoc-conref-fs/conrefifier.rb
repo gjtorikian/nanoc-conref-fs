@@ -42,28 +42,11 @@ module NanocConrefFS
             liquified.empty? ? match : liquified
           end
         end
-
-        # This converts ": *" frontmatter strings into HTML equivalents;
-        # otherwise, ": *" messes the YAML parsing
-        result = result.gsub(/\A---\s*\n(.*?\n?)^---\s*$\n?/m) do |frontmatter|
-          frontmatter.gsub(/:\s*(\*.+)/) do |_|
-            asterisk_match = Regexp.last_match[1]
-            if asterisk_match[1] != '*'
-              asterisk_match = asterisk_match.sub(/\*(.+?)\*/, ': <em>\1</em>')
-            else
-              asterisk_match = asterisk_match.sub(/\*{2}(.+?)\*{2}/, ': <strong>\1</strong>')
-            end
-            asterisk_match
-          end
-        end
       rescue Liquid::SyntaxError => e
         # unrecognized Liquid, so just return the content
         STDERR.puts "Could not convert #{filename}: #{e.message}"
-        result
       rescue => e
         raise "#{e.message}: #{e.inspect}"
-      ensure
-        result
       end
     end
 
