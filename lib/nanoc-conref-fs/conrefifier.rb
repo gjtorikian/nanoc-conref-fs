@@ -32,16 +32,6 @@ module NanocConrefFS
         if result =~ NanocConrefFS::Conrefifier::BLOCK_SUB || result =~ NanocConrefFS::Conrefifier::SINGLE_SUB
           result = NanocConrefFS::Conrefifier.apply_liquid(result, page_vars)
         end
-
-        # This second pass renders any previously inserted
-        # data conditionals within the body. If a Liquid parse
-        # returns a blank string, we'll return the original
-        if result =~ NanocConrefFS::Conrefifier::SINGLE_SUB
-          result = result.gsub(NanocConrefFS::Conrefifier::SINGLE_SUB) do |match|
-            liquified = NanocConrefFS::Conrefifier.apply_liquid(match, page_vars)
-            liquified.empty? ? match : liquified
-          end
-        end
       rescue Liquid::SyntaxError => e
         # unrecognized Liquid, so just return the content
         STDERR.puts "Could not convert #{filename}: #{e.message}"
@@ -58,7 +48,17 @@ module NanocConrefFS
 
     def self.apply_liquid(content, data_vars)
       data_vars['page'] = data_vars[:page].stringify_keys
-      Liquid::Template.parse(content, :error_mode => :warn).render(data_vars)
+      result = Liquid::Template.parse(content, :error_mode => :warn).render(data_vars)
+      # This second pass renders any previously inserted
+      # data conditionals within the body. If a Liquid parse
+      # returns a blank string, we'll return the original
+      if result =~ NanocConrefFS::Conrefifier::SINGLE_SUB
+        result = result.gsub(NanocConrefFS::Conrefifier::SINGLE_SUB) do |match|
+          liquified = NanocConrefFS::Conrefifier.apply_liquid(match, data_vars)
+          liquified.empty? ? match : liquified
+        end
+      end
+      result
     end
   end
 end

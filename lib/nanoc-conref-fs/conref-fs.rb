@@ -49,10 +49,6 @@ class ConrefFS < Nanoc::DataSource
       # This pass replaces any matched conditionals
       if value =~ NanocConrefFS::Conrefifier::BLOCK_SUB || value =~ NanocConrefFS::Conrefifier::SINGLE_SUB
         value = NanocConrefFS::Conrefifier.apply_liquid(value, page_vars)
-        # This pass replaces any included conrefs
-        if value =~ NanocConrefFS::Conrefifier::SINGLE_SUB
-          value = NanocConrefFS::Conrefifier.apply_liquid(value, page_vars)
-        end
         item[key] = value
       end
     end
