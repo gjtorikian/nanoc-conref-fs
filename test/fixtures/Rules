@@ -11,6 +11,7 @@ compile '/**/*.html' do
 end
 
 compile '/**/*.md' do
+  filter :'conref-fs-filter'
   if item[:filename] =~ /retrieve/
     layout '/retrieve.*'
   elsif item[:filename] =~ /_children/
@@ -20,7 +21,6 @@ compile '/**/*.md' do
   else
     layout '/default.*'
   end
-  filter :'conref-fs-filter'
 end
 
 route '/**/*.md' do

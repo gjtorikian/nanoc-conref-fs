@@ -39,10 +39,22 @@ class ConrefFS < Nanoc::DataSource
       item[:children] = NanocConrefFS::Ancestry::create_children(toc, item.attributes)
     end
 
-    # item[:unparsed_content] = @unparsed_content
-
     page_vars.each_pair do |key, value|
       item[key] = value
+    end
+
+    page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables)
+
+    item.attributes.each_pair do |key, value|
+      # This pass replaces any matched conditionals
+      if value =~ NanocConrefFS::Conrefifier::BLOCK_SUB || value =~ NanocConrefFS::Conrefifier::SINGLE_SUB
+        value = NanocConrefFS::Conrefifier.apply_liquid(value, page_vars)
+        # This pass replaces any included conrefs
+        if value =~ NanocConrefFS::Conrefifier::SINGLE_SUB
+          value = NanocConrefFS::Conrefifier.apply_liquid(value, page_vars)
+        end
+        item[key] = value
+      end
     end
   end
 

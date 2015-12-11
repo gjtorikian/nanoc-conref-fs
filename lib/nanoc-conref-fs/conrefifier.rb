@@ -29,7 +29,7 @@ module NanocConrefFS
         result = content
 
         # This pass replaces any matched conditionals
-        if result =~ NanocConrefFS::Conrefifier::BLOCK_SUB || result =~ Conrefifier::SINGLE_SUB
+        if result =~ NanocConrefFS::Conrefifier::BLOCK_SUB || result =~ NanocConrefFS::Conrefifier::SINGLE_SUB
           result = NanocConrefFS::Conrefifier.apply_liquid(result, page_vars)
         end
 
