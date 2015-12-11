@@ -14,7 +14,10 @@ class VariablesTest < MiniTest::Test
   end
 
   def test_it_fetches_datafiles
-    file = NanocConrefFS::Variables.fetch_data_file('reusables.intro')
-    assert_equal file['frontmatter_intro'], 'Here I am, in the front.'
+    with_site(name: FIXTURES_DIR) do |site|
+
+      file = NanocConrefFS::Variables.fetch_data_file('reusables.intro')
+      assert_equal file['frontmatter_intro'], 'Here I am, in the front.'
+    end
   end
 end
