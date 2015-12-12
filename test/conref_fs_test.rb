@@ -162,4 +162,18 @@ class DatafilesTest < MiniTest::Test
       assert_equal output_file, test_file
     end
   end
+
+  def test_multiple_outputs
+    with_site(name: FIXTURES_DIR) do |site|
+
+      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+      site.compile
+
+      single_var_github = read_output_file('multiple', 'single_var')
+      assert_match(/Welcome to GitHub/, single_var_github)
+
+      single_var_x = read_output_file('multiple', 'single_var_x')
+      assert_match(/Welcome to GitHub X/, single_var_x)
+    end
+  end
 end

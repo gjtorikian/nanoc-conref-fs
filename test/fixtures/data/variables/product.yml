@@ -2,6 +2,15 @@ product_name:
   dotcom: 'GitHub'
   '2.0': 'GitHub Enterprise'
 
+multi_name:
+  {% if page.version == 'dotcom' %}
+    'GitHub'
+  {% elsif page.version == 'x' %}
+    'GitHub X'
+  {% else %}
+    'GitHub Enterprise'
+  {% endif %}
+
 caveat: |
   {% if page.version == 'dotcom' %}
 
