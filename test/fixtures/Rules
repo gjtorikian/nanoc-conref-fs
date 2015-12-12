@@ -6,9 +6,7 @@ preprocess do
   end
 end
 
-compile '/**/*.html' do
-  layout '/default.*'
-end
+ignore '/**/*.html'
 
 compile '/**/*.md' do
   filter :'conref-fs-filter'
