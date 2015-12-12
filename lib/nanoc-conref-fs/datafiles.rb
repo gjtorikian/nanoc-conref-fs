@@ -31,8 +31,6 @@ module NanocConrefFS
       end
     end
 
-    private
-
     def self.collect_data(dir)
       data_files = {}
       Dir["#{dir}/**/*.{yaml,yml}"].each do |filename|

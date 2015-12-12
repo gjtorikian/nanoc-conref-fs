@@ -7,8 +7,6 @@ class ConrefFS < Nanoc::DataSource
 
   identifier :'conref-fs'
 
-  attr_reader :unparsed_content
-
   # Before iterating over the file objects, this method loads the data folder
   # and applies it to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
