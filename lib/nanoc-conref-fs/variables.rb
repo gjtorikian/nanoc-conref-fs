@@ -17,7 +17,7 @@ module NanocConrefFS
       @data_files = data_files
     end
 
-    def self.fetch_data_file(association, rep = :default)
+    def self.fetch_data_file(association, rep)
       return nil unless association
       reference = association.split('.')
       data = @variables[rep]['site']['data']
