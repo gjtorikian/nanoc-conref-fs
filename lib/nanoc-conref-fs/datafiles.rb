@@ -10,8 +10,13 @@ module NanocConrefFS
       data_vars = { :page => data_vars, :site => { :config => config } }
 
       content = obfuscate_liquid(content, data_vars)
+      begin
+        doc = YAML.load(content)
+      rescue Psych::SyntaxError => e
+        STDERR.puts "Could not convert \n#{content}"
+        raise "#{e.message}: #{e.inspect}"
+      end
 
-      doc = YAML.load(content)
       data_keys = "#{path}".sub(%r{^data/}, '').gsub(%r{/}, '.').sub(/\.yml/, '').split('.')
       # we don't need to create a nested hash for root-level data files
       if data_keys.length == 1
