@@ -10,7 +10,7 @@ class ConrefFS < Nanoc::DataSource
   # Before iterating over the file objects, this method loads the data folder
   # and applies it to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
-    if klass == Nanoc::Int::Item && NanocConrefFS::Variables.data_files.nil?
+    if NanocConrefFS::Variables.data_files.nil?
       data_files = NanocConrefFS::Datafiles.collect_data(data_dir_name)
       NanocConrefFS::Variables.data_files = data_files
       NanocConrefFS::Variables.variables = {}

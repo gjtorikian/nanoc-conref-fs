@@ -19,7 +19,7 @@ module NanocConrefFS
 
     def self.fetch_data_file(association, rep = :default)
       reference = association.split('.')
-      data = variables[rep]['site']['data']
+      data = @variables[rep]['site']['data']
       while key = reference.shift
         data = data[key]
       end

@@ -12,7 +12,7 @@ module NanocConrefFS
       content = obfuscate_liquid(content, data_vars)
 
       doc = YAML.load(content)
-      data_keys = "#{path}".gsub(%r{^data/}, '').gsub(%r{/}, '.').gsub(/\.yml/, '').split('.')
+      data_keys = "#{path}".sub(%r{^data/}, '').gsub(%r{/}, '.').sub(/\.yml/, '').split('.')
       # we don't need to create a nested hash for root-level data files
       if data_keys.length == 1
         { data_keys.first => doc }
