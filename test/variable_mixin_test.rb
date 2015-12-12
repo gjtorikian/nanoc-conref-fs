@@ -8,8 +8,8 @@ class VariablesTest < MiniTest::Test
       site = Nanoc::Int::SiteLoader.new.new_from_cwd
       site.compile
 
-      assert_equal NanocConrefFS::Variables.variables.keys, ['site']
-      assert_equal NanocConrefFS::Variables.variables['site']['data'].keys, %w(categories reusables variables)
+      assert_equal NanocConrefFS::Variables.variables[:default].keys, ['site']
+      assert_equal NanocConrefFS::Variables.variables[:default]['site']['data'].keys, %w(categories reusables variables)
     end
   end
 

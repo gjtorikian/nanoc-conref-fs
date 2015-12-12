@@ -10,7 +10,11 @@ class ConrefFS < Nanoc::DataSource
   # Before iterating over the file objects, this method loads the data folder
   # and applies it to an ivar for later usage.
   def load_objects(dir_name, kind, klass)
-    load_data_folder if klass == Nanoc::Int::Item && @variables.nil?
+    if klass == Nanoc::Int::Item && NanocConrefFS::Variables.data_files.nil?
+      data_files = NanocConrefFS::Datafiles.collect_data(data_dir_name)
+      NanocConrefFS::Variables.data_files = data_files
+      NanocConrefFS::Variables.variables = {}
+    end
     super
   end
 
@@ -18,21 +22,20 @@ class ConrefFS < Nanoc::DataSource
     config.fetch(:data_dir, 'data')
   end
 
-  def load_data_folder
-    @data_files = NanocConrefFS::Datafiles.collect_data(data_dir_name)
-    NanocConrefFS::Variables.data_files = @data_files
-    data = NanocConrefFS::Datafiles.process(@data_files, @site_config)
-    config = @site_config.to_h
-    @variables = { 'site' => { 'config' => config, 'data' => data } }
-    NanocConrefFS::Variables.variables = @variables
+  def self.load_data_folder(config, rep)
+    if NanocConrefFS::Variables.variables[rep].nil?
+      data_files = NanocConrefFS::Variables.data_files
+      data = NanocConrefFS::Datafiles.process(data_files, config, rep)
+      NanocConrefFS::Variables.variables[rep] = { 'site' => { 'config' => config, 'data' => data } }
+    end
   end
 
-  def self.apply_attributes(config, item)
+  def self.apply_attributes(config, item, rep)
     page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename])
 
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
-      toc = NanocConrefFS::Variables.fetch_data_file(association)
+      toc = NanocConrefFS::Variables.fetch_data_file(association, rep)
       item[:parents] = NanocConrefFS::Ancestry::create_parents(toc, item.attributes)
       item[:children] = NanocConrefFS::Ancestry::create_children(toc, item.attributes)
     end
@@ -41,7 +44,7 @@ class ConrefFS < Nanoc::DataSource
       item[key] = value
     end
 
-    page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables)
+    page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 
     item.attributes.each_pair do |key, value|
       # This pass replaces any matched conditionals
