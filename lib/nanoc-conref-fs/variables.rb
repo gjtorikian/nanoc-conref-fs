@@ -18,6 +18,7 @@ module NanocConrefFS
     end
 
     def self.fetch_data_file(association, rep = :default)
+      return nil unless association
       reference = association.split('.')
       data = @variables[rep]['site']['data']
       while key = reference.shift
