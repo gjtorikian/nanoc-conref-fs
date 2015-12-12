@@ -31,7 +31,7 @@ class ConrefFS < Nanoc::DataSource
   end
 
   def self.apply_attributes(config, item, rep)
-    page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename])
+    page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename], rep)
 
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]

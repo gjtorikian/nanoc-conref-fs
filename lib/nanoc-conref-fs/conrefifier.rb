@@ -5,19 +5,22 @@ module NanocConrefFS
     SINGLE_SUB = /(\{\{[^\}]+\}\})/m
     BLOCK_SUB = /\{% (?:if|unless).+? %\}.*?\{% end(?:if|unless) %\}/m
 
-    def self.file_variables(variables, path)
+    def self.file_variables(variables, path, rep)
       return {} if variables.nil?
 
       data_vars = {}
       scopes = variables.select { |v| v[:scope][:path].empty? || Regexp.new(v[:scope][:path]) =~ path }
       scopes.each do |scope|
+        unless scope[:scope][:rep].nil?
+          next unless rep == scope[:scope][:rep]
+        end
         data_vars = data_vars.merge(scope[:values])
       end
       data_vars
     end
 
     def self.liquify(config, path:, content:, rep: :default)
-      page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], path)
+      page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], path, rep)
       page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 
       # we must obfuscate essential ExtendedMarkdownFilter content
