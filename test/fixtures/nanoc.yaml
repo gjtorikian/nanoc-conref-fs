@@ -8,7 +8,8 @@ data_variables:
   -
     scope:
       path: ""
-      rep: :X
+      reps:
+        - :X
     values:
       version: "X"
 

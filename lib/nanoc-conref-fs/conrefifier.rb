@@ -11,8 +11,8 @@ module NanocConrefFS
       data_vars = {}
       scopes = variables.select { |v| v[:scope][:path].empty? || Regexp.new(v[:scope][:path]) =~ path }
       scopes.each do |scope|
-        unless scope[:scope][:rep].nil?
-          next unless rep == scope[:scope][:rep]
+        unless scope[:scope][:reps].nil?
+          next unless scope[:scope][:reps].include?(rep)
         end
         data_vars = data_vars.merge(scope[:values])
       end
