@@ -5,6 +5,12 @@ data_variables:
       path: ""
     values:
       version: "dotcom"
+  -
+    scope:
+      path: ""
+      rep: :X
+    values:
+      version: "X"
 
 page_variables:
   -

@@ -5,7 +5,7 @@ product_name:
 multi_name:
   {% if page.version == 'dotcom' %}
     'GitHub'
-  {% elsif page.version == 'x' %}
+  {% elsif page.version == 'X' %}
     'GitHub X'
   {% else %}
     'GitHub Enterprise'
