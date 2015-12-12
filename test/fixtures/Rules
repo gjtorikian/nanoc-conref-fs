@@ -33,7 +33,6 @@ route '/multiple/single_var.md', :rep => :X do
 end
 
 # compile '/**/*.md', :rep => :cloud do
-#   # NanocConrefFS::Conrefifier.liquify(@item.raw_filename, @item[:unparsed_content], @config)
 #   if item[:filename] =~ /retrieve/
 #     layout '/retrieve.*'
 #   elsif item[:filename] =~ /_children/

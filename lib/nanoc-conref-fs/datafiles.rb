@@ -5,7 +5,7 @@ require_relative 'conrefifier'
 
 module NanocConrefFS
   module Datafiles
-    def self.apply_conditionals(config, path, content, rep = 'default')
+    def self.apply_conditionals(config, path:, content:, rep: :default)
       data_vars = Conrefifier.file_variables(config[:data_variables], path)
       data_vars = { :page => data_vars, :site => { :config => config } }
 
@@ -42,7 +42,7 @@ module NanocConrefFS
     def self.process(data_files, config, rep)
       data = {}
       data_files.each_pair do |filename, content|
-        conditionals = apply_conditionals(config, filename, content, rep)
+        conditionals = apply_conditionals(config, path: filename, content: content, rep: rep)
         data = data.deep_merge(conditionals)
       end
       data
