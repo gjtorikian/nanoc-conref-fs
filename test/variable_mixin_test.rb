@@ -15,7 +15,6 @@ class VariablesTest < MiniTest::Test
 
   def test_it_fetches_datafiles
     with_site(name: FIXTURES_DIR) do |site|
-      ConrefFS.load_data_folder(CONFIG, :default)
       file = NanocConrefFS::Variables.fetch_data_file('reusables.intro', :default)
       assert_equal file['frontmatter_intro'], 'Here I am, in the front.'
     end
