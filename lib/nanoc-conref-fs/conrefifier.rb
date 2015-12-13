@@ -10,12 +10,12 @@ module NanocConrefFS
 
       data_vars = {}
       scopes = variables.select do |v|
-        v[:scope][:path].empty? || Regexp.new(v[:scope][:path]) =~ path
+        scope_block = v[:scope]
+        scoped_path = scope_block[:path].empty? || Regexp.new(scope_block[:path]) =~ path
+        scoped_rep  = scope_block[:reps].nil? ? true : scope_block[:reps].include?(rep)
+        scoped_path && scoped_rep
       end
       scopes.each do |scope|
-        unless scope[:scope][:reps].nil?
-          next unless scope[:scope][:reps].include?(rep)
-        end
         data_vars = data_vars.merge(scope[:values])
       end
       data_vars
