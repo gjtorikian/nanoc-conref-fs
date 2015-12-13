@@ -9,13 +9,11 @@ class ConrefFS < Nanoc::DataSource
 
   # Before iterating over the file objects, this method loads the data folder
   # and applies it to an ivar for later usage.
-  def load_objects(dir_name, kind, klass)
-    if NanocConrefFS::Variables.data_files.nil?
-      data_files = NanocConrefFS::Datafiles.collect_data(data_dir_name)
-      NanocConrefFS::Variables.data_files = data_files
-      NanocConrefFS::Variables.variables = {}
-    end
-    super
+  def up
+    return unless NanocConrefFS::Variables.data_files.nil?
+    data_files = NanocConrefFS::Datafiles.collect_data(data_dir_name)
+    NanocConrefFS::Variables.data_files = data_files
+    NanocConrefFS::Variables.variables = {}
   end
 
   def data_dir_name
@@ -23,11 +21,10 @@ class ConrefFS < Nanoc::DataSource
   end
 
   def self.load_data_folder(config, rep)
-    if NanocConrefFS::Variables.variables[rep].nil?
-      data_files = NanocConrefFS::Variables.data_files
-      data = NanocConrefFS::Datafiles.process(data_files, config, rep)
-      NanocConrefFS::Variables.variables[rep] = { 'site' => { 'config' => config, 'data' => data } }
-    end
+    return unless NanocConrefFS::Variables.variables[rep].nil?
+    data_files = NanocConrefFS::Variables.data_files
+    data = NanocConrefFS::Datafiles.process(data_files, config, rep)
+    NanocConrefFS::Variables.variables[rep] = { 'site' => { 'config' => config, 'data' => data } }
   end
 
   def self.apply_attributes(config, item, rep)

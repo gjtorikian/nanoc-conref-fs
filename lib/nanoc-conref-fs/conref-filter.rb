@@ -21,7 +21,6 @@ class ConrefFSFilter < Nanoc::Filter
   identifier :'conref-fs-filter'
 
   def run(content, _)
-    ConrefFS.load_data_folder(@config, @rep.name)
     ConrefFS.apply_attributes(@config, item, @rep.name)
     NanocConrefFS::Conrefifier.liquify(@config, path: @item[:filename], content: content, rep: @rep.name)
   end
