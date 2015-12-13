@@ -19,7 +19,7 @@ class ConrefFS < Nanoc::DataSource
   end
 
   def data_dir_name
-    config.fetch(:data_dir, 'data')
+    config.fetch(:data_dir) { |_| 'data' }
   end
 
   def self.load_data_folder(config, rep)
