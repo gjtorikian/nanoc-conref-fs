@@ -9,7 +9,9 @@ module NanocConrefFS
       return {} if variables.nil?
 
       data_vars = {}
-      scopes = variables.select { |v| v[:scope][:path].empty? || Regexp.new(v[:scope][:path]) =~ path }
+      scopes = variables.select do |v|
+        v[:scope][:path].empty? || Regexp.new(v[:scope][:path]) =~ path
+      end
       scopes.each do |scope|
         unless scope[:scope][:reps].nil?
           next unless scope[:scope][:reps].include?(rep)
