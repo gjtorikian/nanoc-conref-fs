@@ -62,9 +62,33 @@ class ConrefFS < Nanoc::DataSource
     content.gsub(/^([^:]+): (\{\{.+)/, '\1: \'\2\'')
   end
 
+  def self.create_ignore_rules(rep, file)
+    current_articles = NanocConrefFS::Variables.fetch_data_file(file, rep)
+    current_articles = current_articles.values.flatten
+    current_articles = fix_nested_content(current_articles)
+
+    basic_yaml = NanocConrefFS::Variables.data_files["data/#{file.tr!('.', '/')}.yml"]
+    basic_yaml.gsub!(/\{%.+/, '')
+    full_file = YAML.load(basic_yaml)
+    full_user_articles = full_file.values.flatten
+    full_user_articles = fix_nested_content(full_user_articles)
+
+    blacklisted_articles = full_user_articles - current_articles
+    blacklisted_articles.map do |article|
+      "**/#{article.parameterize}.md"
+    end
+  end
+
+  def self.fix_nested_content(articles)
+    articles.delete_if do |i|
+      if i.is_a? Hash
+        articles.concat(i.keys.concat(i.values).flatten)
+        true
+      else
+        false
       end
     end
-    content
+    articles
   end
 
   # This method is extracted from the Nanoc default FS
