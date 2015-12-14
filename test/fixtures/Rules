@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 
 preprocess do
-  ConrefFS.load_data_folder(CONFIG, :default)
-  ConrefFS.load_data_folder(CONFIG, :X)
 end
 
 ignore '/**/*.html'
