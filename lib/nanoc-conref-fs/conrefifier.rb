@@ -15,9 +15,11 @@ module NanocConrefFS
         scoped_rep  = scope_block[:reps].nil? ? true : scope_block[:reps].include?(rep)
         scoped_path && scoped_rep
       end
+
       scopes.each do |scope|
         data_vars = data_vars.merge(scope[:values])
       end
+
       data_vars
     end
 
