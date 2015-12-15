@@ -6,8 +6,8 @@ require_relative 'conrefifier'
 module NanocConrefFS
   module Datafiles
     def self.apply_conditionals(config, path:, content:, rep: :default)
-      data_vars = Conrefifier.file_variables(config[:data_variables], path, rep)
-      data_vars = { :page => data_vars, :site => { :config => config } }
+      vars = Conrefifier.file_variables(config[:data_variables], path, rep)
+      data_vars = { :page => vars, :site => { :config => config } }
 
       content = obfuscate_liquid(content, data_vars)
       begin
