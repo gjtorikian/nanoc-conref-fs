@@ -82,7 +82,7 @@ class ConrefFS < Nanoc::DataSource
 
     blacklisted_articles = full_user_articles - current_articles
     blacklisted_articles.map do |article|
-      "**/#{article.parameterize}.md"
+      "#{article.parameterize}.md"
     end
   end
 
