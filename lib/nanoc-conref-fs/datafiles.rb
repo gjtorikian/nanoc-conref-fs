@@ -17,7 +17,11 @@ module NanocConrefFS
         raise "#{e.message}: #{e.inspect}"
       end
 
-      data_keys = "#{path}".sub(%r{^data/}, '').gsub(%r{/}, '.').sub(/\.yml/, '').split('.')
+      path = path.dup
+      path.slice!('data/')
+      path.sub!(/\.[yaml]{3,4}\z/, '')
+      data_keys = path.split('/')
+
       # we don't need to create a nested hash for root-level data files
       if data_keys.length == 1
         { data_keys.first => doc }
