@@ -12,9 +12,13 @@ module NanocConrefFS
       scopes = variables.select do |v|
         scope_block = v[:scope]
         scoped_path = scope_block[:path].empty? || Regexp.new(scope_block[:path]) =~ path
-        scoped_rep  = scope_block[:reps].nil? ? true : scope_block[:reps].include?(rep)
+        scoped_rep  = scope_block[:reps].nil? || scope_block[:reps].include?(rep)
         scoped_path && scoped_rep
       end
+
+      # I benchmarked that assignment is much faster than
+      # merging an empty hash
+      return scopes.first[:values] if scopes.length == 1
 
       scopes.each do |scope|
         data_vars = data_vars.merge(scope[:values])
