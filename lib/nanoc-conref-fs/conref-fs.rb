@@ -32,6 +32,8 @@ class ConrefFS < Nanoc::DataSource
   def self.apply_attributes(config, item, rep)
     page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename], rep)
 
+    frontmatter_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
+
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
       toc = NanocConrefFS::Variables.fetch_data_file(association, rep)
@@ -43,13 +45,17 @@ class ConrefFS < Nanoc::DataSource
       item[key] = value
     end
 
-    page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
-
     item.attributes.each_pair do |key, value|
-      # This pass replaces any matched conditionals in the frontmatter
-      if value =~ NanocConrefFS::Conrefifier::BLOCK_SUB || value =~ NanocConrefFS::Conrefifier::SINGLE_SUB
-        value = NanocConrefFS::Conrefifier.apply_liquid(value, page_vars)
-        item[key] = value
+      if value.is_a?(Array)
+        item[key] = value.map do |arr_v|
+          return arr_v unless arr_v =~ NanocConrefFS::Conrefifier::SINGLE_SUB
+          NanocConrefFS::Conrefifier.apply_liquid(arr_v, frontmatter_vars)
+        end
+      else
+        if value =~ NanocConrefFS::Conrefifier::SINGLE_SUB
+          value = NanocConrefFS::Conrefifier.apply_liquid(value, frontmatter_vars)
+          item[key] = value
+        end
       end
     end
   end
