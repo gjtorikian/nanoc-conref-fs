@@ -9,6 +9,7 @@ module NanocConrefFS
       return {} if variables.nil?
 
       data_vars = {}
+
       scopes = variables.select do |v|
         scope_block = v[:scope]
         scoped_path = scope_block[:path].empty? || Regexp.new(scope_block[:path]) =~ path
@@ -27,7 +28,7 @@ module NanocConrefFS
       data_vars
     end
 
-    def self.liquify(config, path:, content:, rep: :default)
+    def self.liquify(config, path:, content:, rep:)
       page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], path, rep)
       page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 

@@ -5,7 +5,7 @@ require_relative 'conrefifier'
 
 module NanocConrefFS
   module Datafiles
-    def self.apply_conditionals(config, path:, content:, rep: :default)
+    def self.apply_conditionals(config, path:, content:, rep:)
       vars = Conrefifier.file_variables(config[:data_variables], path, rep)
       data_vars = { :page => vars, :site => { :config => config } }
 
