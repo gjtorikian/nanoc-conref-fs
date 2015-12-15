@@ -46,7 +46,7 @@ class ConrefFS < Nanoc::DataSource
     page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 
     item.attributes.each_pair do |key, value|
-      # This pass replaces any matched conditionals
+      # This pass replaces any matched conditionals in the frontmatter
       if value =~ NanocConrefFS::Conrefifier::BLOCK_SUB || value =~ NanocConrefFS::Conrefifier::SINGLE_SUB
         value = NanocConrefFS::Conrefifier.apply_liquid(value, page_vars)
         item[key] = value
@@ -64,19 +64,37 @@ class ConrefFS < Nanoc::DataSource
 
   def self.create_ignore_rules(rep, file)
     current_articles = NanocConrefFS::Variables.fetch_data_file(file, rep)
-    current_articles = current_articles.values.flatten
+    current_articles = flatten_list(current_articles).flatten
     current_articles = fix_nested_content(current_articles)
 
     basic_yaml = NanocConrefFS::Variables.data_files["data/#{file.tr!('.', '/')}.yml"]
     basic_yaml.gsub!(/\{%.+/, '')
     full_file = YAML.load(basic_yaml)
-    full_user_articles = full_file.values.flatten
+
+    full_user_articles = flatten_list(full_file).flatten
     full_user_articles = fix_nested_content(full_user_articles)
 
     blacklisted_articles = full_user_articles - current_articles
     blacklisted_articles.map do |article|
       "**/#{article.parameterize}.md"
     end
+  end
+
+  def self.flatten_list(arr)
+    result = []
+    return result unless arr
+    arr.each do |item|
+      if item.is_a?(Hash)
+        item.each_pair do |key, value|
+          result << key
+          result.concat(value)
+        end
+      else
+        result << item
+      end
+    end
+
+    result
   end
 
   def self.fix_nested_content(articles)
