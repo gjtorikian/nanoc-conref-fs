@@ -60,12 +60,39 @@ class ConrefFS < Nanoc::DataSource
     end
   end
 
-  # This file reads each piece of content as it comes in. It also catches and fixes
-  # an error where YAML frontmatter cannot start with a curly brace
-  # (eg. intro: '{{ ... }}')
-  def read(filename)
-    content = super
-    content.gsub(/^([^:]+): (\{\{.+)/, '\1: \'\2\'')
+  # There are a lot of problems when trying to parse liquid
+  # out of the frontmatter—all of them dealing with collision between
+  # the { character in Liquid and its signfigance in YAML. We'll overload
+  # the parse method here to resolve those issues ahead of time.
+  def parse(content_filename, meta_filename, _kind)
+    # Read data
+    data = read(content_filename)
+
+    # Check presence of metadata section
+    return [{}, data] if data !~ /\A-{3,5}\s*$/
+
+    # Split data
+    pieces = data.split(/^(-{5}|-{3})[ \t]*\r?\n?/, 3)
+    if pieces.size < 4
+      raise RuntimeError.new(
+        "The file '#{content_filename}' appears to start with a metadata section (three or five dashes at the top) but it does not seem to be in the correct format.",
+      )
+    end
+
+    # N.B. the only change to the original function
+    pieces[2].gsub!(/^([^:]+): (\{\{.+)/, '\1: \'\2\'')
+
+    # Parse
+    begin
+      meta = YAML.load(pieces[2]) || {}
+    rescue Exception => e
+      raise "Could not parse YAML for #{content_filename}: #{e.message}"
+    end
+    verify_meta(meta, content_filename)
+    content = pieces[4]
+
+    # Done
+    [meta, content]
   end
 
   def self.create_ignore_rules(rep, file)
