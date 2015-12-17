@@ -1,10 +1,12 @@
 #!/usr/bin/env ruby
 
-compile '/**/*.html' do
-  layout '/default.*'
+preprocess do
 end
 
+ignore '/**/*.html'
+
 compile '/**/*.md' do
+  filter :'conref-fs-filter'
   if item[:filename] =~ /retrieve/
     layout '/retrieve.*'
   elsif item[:filename] =~ /_children/
@@ -16,8 +18,18 @@ compile '/**/*.md' do
   end
 end
 
+compile '/multiple/single_var.md', :rep => :X do
+  filter :'conref-fs-filter'
+  filter :erb
+  layout '/default.*'
+end
+
 route '/**/*.md' do
   item.identifier.without_ext + '/index.html'
+end
+
+route '/multiple/single_var.md', :rep => :X do
+  item.identifier.without_ext + '_x/index.html'
 end
 
 route '/**/*' do

@@ -5,6 +5,13 @@ data_variables:
       path: ""
     values:
       version: "dotcom"
+  -
+    scope:
+      path: ""
+      reps:
+        - :X
+    values:
+      version: "X"
 
 page_variables:
   -
@@ -63,6 +70,9 @@ data_sources:
     encoding: utf-8
 
     identifier_type: full
+    reps:
+      - :default
+      - :X
 
 checks:
   internal_links:
