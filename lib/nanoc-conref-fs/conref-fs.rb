@@ -31,7 +31,6 @@ class ConrefFS < Nanoc::DataSource
 
   def self.apply_attributes(config, item, rep)
     page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename], rep)
-
     frontmatter_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 
     unless page_vars[:data_association].nil?
@@ -47,10 +46,17 @@ class ConrefFS < Nanoc::DataSource
 
     item.attributes.each_pair do |key, value|
       if value.is_a?(Array)
-        item[key] = value.map do |arr_v|
-          return arr_v unless arr_v =~ NanocConrefFS::Conrefifier::SINGLE_SUB
-          NanocConrefFS::Conrefifier.apply_liquid(arr_v, frontmatter_vars)
+        frontmatter = []
+        # tried to do this with `map` and it completely erased the attributes
+        # array; not sure why
+        value.each do |v|
+          frontmatter << if v =~ NanocConrefFS::Conrefifier::SINGLE_SUB
+                           NanocConrefFS::Conrefifier.apply_liquid(v, frontmatter_vars)
+                         else
+                           v
+                         end
         end
+        item[key] = frontmatter
       else
         if value =~ NanocConrefFS::Conrefifier::SINGLE_SUB
           value = NanocConrefFS::Conrefifier.apply_liquid(value, frontmatter_vars)
