@@ -25,6 +25,8 @@ data_sources:
       - :X
 ```
 
+You can add `filter :'conref-fs-filter'` to any of your `compile` Rules to then have them renderer through the conref processor.
+
 **NOTE:** If you use this library with Nanoc's ERB filter, and want to use `render`, you'll need to monkey-patch an alias to avoid conflicts with Liquid:
 
 ``` ruby
