@@ -18,7 +18,6 @@ module NanocConrefFS
     end
 
     def self.fetch_data_file(association, rep)
-      puts 'hello!!!'
       return nil unless association
       reference = association.split('.')
       data = @variables[rep]['site']['data']

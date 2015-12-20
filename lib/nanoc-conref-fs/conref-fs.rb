@@ -33,6 +33,8 @@ class ConrefFS < Nanoc::DataSource
     page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename], rep)
     frontmatter_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 
+    puts "for ", item[:filename]
+    puts "it is ", page_vars
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
       toc = NanocConrefFS::Variables.fetch_data_file(association, rep)
