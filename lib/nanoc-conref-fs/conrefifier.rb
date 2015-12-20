@@ -4,36 +4,27 @@ module NanocConrefFS
   module Conrefifier
     SINGLE_SUB = /(\{\{[^\}]+\}\})/m
     BLOCK_SUB = /\{% (?:if|unless).+? %\}.*?\{% end(?:if|unless) %\}/m
-    PATH_TO_VARS = {}
 
     def self.file_variables(variables, path, rep)
       return {} if variables.nil?
 
       data_vars = {}
 
-      # this saves a bunch of time because we don't need to
-      # recalculate the paths (looping over scopes, etc)
-      if PATH_TO_VARS[rep] && PATH_TO_VARS[rep][path]
-        data_vars = PATH_TO_VARS[rep][path]
+      scopes = variables.select do |v|
+        scope_block = v[:scope]
+        scoped_path = scope_block[:path].empty? || Regexp.new(scope_block[:path]) =~ path
+        scoped_rep  = scope_block[:reps].nil? || scope_block[:reps].include?(rep)
+        scoped_path && scoped_rep
+      end
+
+      # I benchmarked that assignment is much
+      # faster than merging an empty hash
+      if scopes.length == 1
+        data_vars = scopes.first[:values]
       else
-        scopes = variables.select do |v|
-          scope_block = v[:scope]
-          scoped_path = scope_block[:path].empty? || Regexp.new(scope_block[:path]) =~ path
-          scoped_rep  = scope_block[:reps].nil? || scope_block[:reps].include?(rep)
-          scoped_path && scoped_rep
+        scopes.each do |scope|
+          data_vars = data_vars.merge(scope[:values])
         end
-        # I benchmarked that assignment is much faster than
-        # merging an empty hash
-        if scopes.length == 1
-          data_vars = scopes.first[:values]
-        else
-          scopes.each do |scope|
-            data_vars = data_vars.merge(scope[:values])
-          end
-        end
-        # stash for later use
-        PATH_TO_VARS[rep] = {}
-        PATH_TO_VARS[rep][path] = data_vars
       end
 
       data_vars
