@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 
 preprocess do
+  @items.each do |item|
+    ConrefFS.apply_attributes(@config, item, :default)
+  end
 end
 
 ignore '/**/*.html'

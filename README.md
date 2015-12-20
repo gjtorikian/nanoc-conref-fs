@@ -25,7 +25,11 @@ data_sources:
       - :X
 ```
 
-You can add `filter :'conref-fs-filter'` to any of your `compile` Rules to then have them renderer through the conref processor.
+At this point, you'll want to make a couple of changes to your *Rules* file:
+
+* In the `preprocess` block, add a line that looks like this: `ConrefFS.apply_attributes(@config, item, :default)`. This will transform Liquid variables in frontmatter, and add the `:parents` and `:children` attributes to your items (see below).
+
+* Add `filter :'conref-fs-filter'` to any of your `compile` Rules to have them render through the conref processor, converting Liquid variables into the actual YAML text.
 
 **NOTE:** If you use this library with Nanoc's ERB filter, and want to use `render`, you'll need to monkey-patch an alias to avoid conflicts with Liquid:
 
