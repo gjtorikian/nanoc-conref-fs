@@ -1,0 +1,9 @@
+{% if page.version != 'cloud' %}
+Gists:
+  - About gists
+  - Creating gists
+  - Forking and cloning gists
+  {% if page.version == 'dotcom' %}
+  - Deleting an anonymous gist
+  {% endif %}
+{% endif %}

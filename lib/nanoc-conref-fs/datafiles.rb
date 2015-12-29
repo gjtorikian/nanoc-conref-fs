@@ -5,15 +5,17 @@ require_relative 'conrefifier'
 
 module NanocConrefFS
   module Datafiles
+    OBFUSCATION = '~~#~~'
+
     def self.apply_conditionals(config, path:, content:, rep:)
       vars = Conrefifier.file_variables(config[:data_variables], path, rep)
       data_vars = { :page => vars, :site => { :config => config } }
 
-      content = obfuscate_liquid(content, data_vars)
+      content = obfuscate_and_liquify(content, data_vars)
       begin
         doc = YAML.load(content)
       rescue Psych::SyntaxError => e
-        STDERR.puts "Could not convert \n#{content}"
+        STDERR.puts "\nCould not convert following file:\n#{content}"
         raise "#{e.message}: #{e.inspect}"
       end
 
@@ -57,13 +59,12 @@ module NanocConrefFS
       data
     end
 
-    def self.obfuscate_liquid(content, data_vars)
-      content.gsub(Conrefifier::BLOCK_SUB) do |match|
-        # We must obfuscate Liquid variables while replacing conditionals
-        match = match.gsub(/{{/, '~~#~~')
-        match = Conrefifier.apply_liquid(match, data_vars)
-        match.gsub('~~#~~', '{{')
-      end
+    def self.obfuscate_and_liquify(content, data_vars)
+       # We must obfuscate Liquid variables while replacing conditionals,
+       # else they get wiped out
+      content.gsub!(/\{\{/, OBFUSCATION)
+      content = Conrefifier.apply_liquid(content, data_vars)
+      content.gsub(OBFUSCATION, '{{')
     end
   end
 end
