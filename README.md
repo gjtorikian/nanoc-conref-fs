@@ -144,11 +144,11 @@ If you have a special `data_association` value in your `scope`, additional metad
 
 ### Retrieving variables
 
-You can retrieve the stored data at any time (for example, in a layout) by calling `VariableMixin.variables`.
+You can retrieve the stored data at any time (for example, in a layout) by calling `Variables.variables`.
 
 ### Retrieving data files
 
-You can fetch anything in the *data* folder by passing in a string, demarcated with `.`s, to `VariableMixin.fetch_data_file`. For example, `VariableMixin.fetch_data_file('reusables.intro')` will fetch the file in *data/reusables/intro.yml*.
+You can fetch anything in the *data* folder by passing in a string, demarcated with `.`s, to `Variables.fetch_data_file`. For example, `Variables.fetch_data_file('reusables.intro')` will fetch the file in *data/reusables/intro.yml*.
 
 ### Ignoring content
 
