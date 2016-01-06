@@ -48,7 +48,7 @@ module NanocConrefFS
         end
       rescue Liquid::SyntaxError => e
         # unrecognized Liquid, so just return the content
-        STDERR.puts "Could not convert #{filename}: #{e.message}"
+        STDERR.puts "Could not convert #{result}: #{e.message}"
       rescue => e
         raise "#{e.message}: #{e.inspect}"
       end
