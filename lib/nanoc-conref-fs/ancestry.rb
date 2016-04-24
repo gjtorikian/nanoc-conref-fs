@@ -62,36 +62,34 @@ module NanocConrefFS
     # Given a category file that's an array, this method finds
     # the children of an item, probably a map topic
     def find_array_children(toc, title)
-      children = ''
       toc.each do |item|
         next unless item.is_a?(Hash)
         item.each_pair do |key, values|
           if key == title
             children = values.flatten
-            break
+            return children unless children.empty?
           end
         end
-        break unless children.empty?
       end
-      children
+      # Found no children
+      nil
     end
     module_function :find_array_children
 
     # Given a category file that's a hash, this method finds
     # the children of an item, probably a map topic
     def find_hash_children(toc, title)
-      children = ''
       toc.each_key do |key|
         toc[key].each do |item|
           next unless item.is_a?(Hash)
-          unless item[title].nil?
+          if item[title]
             children = item.values.flatten
-            break
+            return children unless children.empty?
           end
         end
-        break unless children.empty?
       end
-      children
+      # Found no children
+      nil
     end
     module_function :find_hash_children
   end
