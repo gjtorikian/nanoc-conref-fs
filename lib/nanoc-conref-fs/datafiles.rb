@@ -45,7 +45,7 @@ module NanocConrefFS
     def self.collect_data(dir)
       data_files = {}
       Dir["#{dir}/**/*.{yaml,yml}"].each do |filename|
-        data_files[filename] = File.read(filename)
+        data_files[filename] = File.read(filename, encoding: 'UTF-8')
       end
       data_files
     end
