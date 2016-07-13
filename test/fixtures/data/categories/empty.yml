@@ -1,0 +1,6 @@
+Has content:
+  - Some content
+Devoid of content:
+  {% if page.version == 'dontbuildme' %}
+  - Content actually
+  {% endif %}
