@@ -3,7 +3,7 @@ require 'test_helper'
 class DatafilesTest < MiniTest::Test
   def test_it_collects_the_files
     files = NanocConrefFS::Datafiles.collect_data(File.join(FIXTURES_DIR, 'data')).keys.sort
-    names = %w(categories/category categories/nested categories/simple reusables/intro reusables/names variables/asterisks variables/empty variables/product)
+    names = %w(categories/category categories/empty categories/nested categories/simple reusables/intro reusables/names variables/asterisks variables/empty variables/product)
     names.map! { |name| File.join(FIXTURES_DIR, 'data', "#{name}.yml") }
     assert_equal files, names
   end
