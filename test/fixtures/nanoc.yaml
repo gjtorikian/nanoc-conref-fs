@@ -29,6 +29,12 @@ page_variables:
       data_association: "categories.simple"
   -
     scope:
+      path: "devoid-of-content"
+    values:
+      version: "dotcom"
+      data_association: "categories.empty"
+  -
+    scope:
       path: "array_children"
     values:
       version: "dotcom"
