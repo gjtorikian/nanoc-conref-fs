@@ -12,7 +12,7 @@ compile '/**/*.md' do
   filter :'conref-fs-filter'
   if item[:filename] =~ /retrieve/
     layout '/retrieve.*'
-  elsif item[:filename] =~ /_children/
+  elsif item[:filename] =~ /_children/ || item[:filename].start_with?('content/empty/')
     layout '/children.*'
   elsif item[:filename] =~ /asterisk/
     layout '/asterisk.*'
