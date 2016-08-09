@@ -37,6 +37,7 @@ module NanocConrefFS
     def find_hash_parents(toc, title)
       parents = ''
       toc.each_key do |key|
+        next if toc[key].nil?
         toc[key].each do |item|
           if item.is_a?(Hash)
             if item.keys.include?(title)
@@ -82,6 +83,7 @@ module NanocConrefFS
     def find_hash_children(toc, title)
       children = ''
       toc.each_key do |key|
+        next if toc[key].nil?
         toc[key].each do |item|
           next unless item.is_a?(Hash)
           unless item[title].nil?
