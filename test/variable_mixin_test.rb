@@ -9,7 +9,7 @@ class VariablesTest < MiniTest::Test
       site.compile
 
       assert_equal NanocConrefFS::Variables.variables[:default].keys, ['site']
-      assert_equal NanocConrefFS::Variables.variables[:default]['site']['data'].keys, %w(categories reusables variables)
+      assert_equal NanocConrefFS::Variables.variables[:default]['site']['data'].keys.sort, %w(categories reusables variables)
     end
   end
 
