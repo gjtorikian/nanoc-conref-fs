@@ -65,19 +65,19 @@ module NanocConrefFS
     # toc - the array containing the table of contents
     # title - the text title to return the children of
     #
-    # Returns a flattened array of all descendants or nil.
+    # Returns a flattened array of all descendants which could be empty.
     def find_array_children(toc, title)
       toc.each do |item|
         next unless item.is_a?(Hash)
         item.each_pair do |key, values|
           if key == title
             children = values.flatten
-            return children unless children.empty?
+            return children
           end
         end
       end
       # Found no children
-      nil
+      Array.new
     end
     module_function :find_array_children
 
@@ -87,19 +87,19 @@ module NanocConrefFS
     # toc - the hash containing the table of contents
     # title - the text title to return the children of
     #
-    # Returns a flattened array of all descendants or nil.
+    # Returns a flattened array of all descendants which could be empty.
     def find_hash_children(toc, title)
       toc.each_key do |key|
         toc[key].each do |item|
           next unless item.is_a?(Hash)
           if item[title]
             children = item.values.flatten
-            return children unless children.empty?
+            return children
           end
         end
       end
       # Found no children
-      nil
+      Array.new
     end
     module_function :find_hash_children
   end
