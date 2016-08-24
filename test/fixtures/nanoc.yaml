@@ -40,6 +40,13 @@ page_variables:
       version: "2.0"
   -
     scope:
+      path: "empty-categories"
+    values:
+      version: "dotcom"
+      data_association: "categories.empty_category"
+      just_a_key: wow!
+  -
+    scope:
       path: "multiple_versions"
     values:
       version: 2.2
