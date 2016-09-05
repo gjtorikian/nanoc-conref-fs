@@ -15,9 +15,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test)/})
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'nanoc', '>= 4.0', '< 4.2'
+  spec.add_runtime_dependency 'nanoc', '~> 4.3.0'
   spec.add_runtime_dependency 'activesupport', '~> 4.2'
-  spec.add_runtime_dependency 'liquid', '~> 3.0'
+  spec.add_runtime_dependency 'liquid', '4.0.0.rc2'
 
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'minitest', '~> 5.8'
