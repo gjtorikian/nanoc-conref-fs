@@ -3,9 +3,7 @@ require 'test_helper'
 class DatafilesTest < MiniTest::Test
 
   def test_it_renders_conrefs_in_frontmatter
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('frontmatter', 'title')
@@ -15,9 +13,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_renders_conrefs_in_frontmatter_at_different_path
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('frontmatter', 'different')
@@ -27,9 +23,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_renders_conrefs_in_frontmatter_with_audience
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('frontmatter', 'audience')
@@ -39,9 +33,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_renders_nested_conrefs
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('datafiles', 'deep')
@@ -51,9 +43,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_renders_nested_conrefs
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('datafiles', 'deep')
@@ -63,9 +53,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_applies_any_attribute
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('attributes', 'attribute')
@@ -75,9 +63,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_does_not_obfuscate_content
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('obfuscation', 'admonitions')
@@ -91,9 +77,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_fetches_variables
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
       output_file = read_output_file('datafiles', 'retrieve')
       test_file = read_test_file('datafiles', 'retrieve')
@@ -102,9 +86,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_ignores_unknown_tags
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('maliciousness', 'unknown')
@@ -114,9 +96,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_works_if_an_asterisk_is_the_first_character
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('maliciousness', 'asterisk_single')
@@ -126,9 +106,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_it_works_if_asterisks_are_the_first_two_characters
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('maliciousness', 'asterisk_double')
@@ -138,9 +116,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_raw_tags
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('liquid', 'raw')
@@ -151,9 +127,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_multiple_version_blocks
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('liquid', 'multiple_versions')
@@ -164,9 +138,7 @@ class DatafilesTest < MiniTest::Test
   end
 
   def test_multiple_outputs
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       single_var_github = read_output_file('multiple', 'single_var')
