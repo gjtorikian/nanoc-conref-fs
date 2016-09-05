@@ -2,9 +2,7 @@ require 'test_helper'
 
 class AncestryTest < MiniTest::Test
   def test_it_renders_single_parents
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('parents', 'single_parent')
@@ -14,9 +12,7 @@ class AncestryTest < MiniTest::Test
   end
 
   def test_it_renders_two_parents
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('parents', 'two_parents')
@@ -26,9 +22,7 @@ class AncestryTest < MiniTest::Test
   end
 
   def test_it_renders_array_parents
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('parents', 'array_parents')
@@ -38,9 +32,7 @@ class AncestryTest < MiniTest::Test
   end
 
   def test_missing_category_title_does_not_blow_up_parents
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('parents', 'missing_title')
@@ -50,9 +42,7 @@ class AncestryTest < MiniTest::Test
   end
 
   def test_it_renders_content_with_no_children
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('children', 'no_children')
@@ -62,9 +52,7 @@ class AncestryTest < MiniTest::Test
   end
 
   def test_it_renders_hash_children
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('children', 'hash_children')
@@ -78,9 +66,7 @@ class AncestryTest < MiniTest::Test
   end
 
   def test_it_renders_array_children
-    with_site(name: FIXTURES_DIR) do |site|
-
-      site = Nanoc::Int::SiteLoader.new.new_from_cwd
+    with_site do |site|
       site.compile
 
       output_file = read_output_file('children', 'array_children')
