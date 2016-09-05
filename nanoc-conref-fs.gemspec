@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'nanoc', '~> 4.3.0'
   spec.add_runtime_dependency 'activesupport', '~> 4.2'
-  spec.add_runtime_dependency 'liquid', '4.0.0.rc2'
+  spec.add_runtime_dependency 'liquid', '3.0.6'
 
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'minitest', '~> 5.8'
