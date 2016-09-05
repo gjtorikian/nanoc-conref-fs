@@ -1,8 +1,7 @@
 require_relative 'conrefifier'
 require 'active_support/core_ext/string'
 
-class ConrefFS < Nanoc::DataSource
-  include Nanoc::DataSources::Filesystem
+class ConrefFS < Nanoc::DataSources::Filesystem
   include NanocConrefFS::Variables
   include NanocConrefFS::Ancestry
 
@@ -70,12 +69,14 @@ class ConrefFS < Nanoc::DataSource
   # out of the frontmatter—all of them dealing with collision between
   # the { character in Liquid and its signfigance in YAML. We'll overload
   # the parse method here to resolve those issues ahead of time.
-  def parse(content_filename, meta_filename, _kind)
+  def parse_with_frontmatter(content_filename)
     # Read data
     data = read(content_filename)
 
     # Check presence of metadata section
-    return [{}, data] if data !~ /\A-{3,5}\s*$/
+    if data !~ /\A-{3,5}\s*$/
+      return ParseResult.new(content: data, attributes: {}, attributes_data: '')
+    end
 
     # Split data
     pieces = data.split(/^(-{5}|-{3})[ \t]*\r?\n?/, 3)
@@ -98,7 +99,7 @@ class ConrefFS < Nanoc::DataSource
     content = pieces[4]
 
     # Done
-    [meta, content]
+    ParseResult.new(content: content, attributes: meta, attributes_data: pieces[2])
   end
 
   def self.create_ignore_rules(rep, file)
@@ -146,30 +147,5 @@ class ConrefFS < Nanoc::DataSource
       end
     end
     articles
-  end
-
-  # This method is extracted from the Nanoc default FS
-  def filename_for(base_filename, ext)
-    if ext.nil?
-      nil
-    elsif ext.empty?
-      base_filename
-    else
-      base_filename + '.' + ext
-    end
-  end
-
-  # This method is extracted from the Nanoc default FS
-  def identifier_for_filename(filename)
-    if config[:identifier_type] == 'full'
-      return Nanoc::Identifier.new(filename)
-    end
-
-    if filename =~ /(^|\/)index(\.[^\/]+)?$/
-      regex = @config && @config[:allow_periods_in_identifiers] ? /\/?(index)?(\.[^\/\.]+)?$/ : /\/?index(\.[^\/]+)?$/
-    else
-      regex = @config && @config[:allow_periods_in_identifiers] ? /\.[^\/\.]+$/ : /\.[^\/]+$/
-    end
-    Nanoc::Identifier.new(filename.sub(regex, ''), type: :legacy)
   end
 end
