@@ -1,14 +1,15 @@
+[![Build Status](https://travis-ci.org/gjtorikian/nanoc-conref-fs.svg)](https://travis-ci.org/gjtorikian/nanoc-conref-fs)
 # nanoc-conref-fs
 
 This gem adds a new Filesystem type to Nanoc called `ConrefFS`. This filesystem permits you to use reusable content and Liquid variables in your content to generate multiple outputs from a single source. It makes heavy use of item representations (or `rep`s for short).
 
 The idea is that you have a set of YAML files in a data folder which act as your reusables. You can apply these reusables throughout your content.
 
-[![Build Status](https://travis-ci.org/gjtorikian/nanoc-conref-fs.svg)](https://travis-ci.org/gjtorikian/nanoc-conref-fs)
+## Setup
 
 To get started, set the data source in your *nanoc.yaml* file:
 
-``` yml
+``` yaml
 data_sources:
   -
     type: conref-fs
@@ -16,7 +17,7 @@ data_sources:
 
 You'll probably also want to provide a list of `rep`s which define all the item reps available to your site. For example:
 
-``` yml
+``` yaml
 data_sources:
   -
     type: conref-fs
@@ -27,11 +28,29 @@ data_sources:
 
 At this point, you'll want to make a couple of changes to your *Rules* file:
 
-* In the `preprocess` block, add a line that looks like this: `ConrefFS.apply_attributes(@config, item, :default)`. This will transform Liquid variables in frontmatter, and add the `:parents` and `:children` attributes to your items (see below).
+* In the `preprocess` block, add a line that looks like this: `ConrefFS.apply_attributes(@config, item, :default)`. This will transform Liquid variables in frontmatter, and add the `:parents` and `:children` attributes to your items [(see below)](#associating-files-with-data).
+
+```yaml
+preprocess do
+  @items.each do |item|
+    ConrefFS.apply_attributes(@config, item, :default)
+  end
+end
+
+```
 
 * Add `filter :'conref-fs-filter'` to any of your `compile` Rules to have them render through the conref processor, converting Liquid variables into the actual YAML text.
 
-**NOTE:** If you use this library with Nanoc's ERB filter, and want to use `render`, you'll need to monkey-patch an alias to avoid conflicts with Liquid:
+```yaml
+compile '/**/*.html' do
+  filter :'conref-fs-filter'
+  filter :erb # If using erb you will need the monkey patch mentioned below.
+  layout '/default.*'
+end
+```
+
+#### Using Erb and Liquid
+If you use this library with Nanoc's ERB filter, and want to use `render`, you'll need to monkey-patch an alias to avoid conflicts with Liquid:
 
 ``` ruby
 require 'nanoc-conref-fs'
@@ -46,11 +65,11 @@ end
 
 Then, you can use `renderp` just as you would with `render`.
 
-## Usage
+## Defining Variables For Templates
 
-Nearly all the usage of this gem relies on a *data* folder, sibling to your *content* and *layouts* folders. See [the test fixture](test/fixtures/data) for an example. You can change this with the `data_dir` config option:
+The variables exposed to your templates follow certain conventions. By default Nanoc Conref FS sources all its variables from a *./data/* folder, sibling to your *content* and *layouts* folders. See [the test fixture](test/fixtures/data) for an example. You can change the default folder with the `data_dir` config option:
 
-``` yml
+``` yaml
 data_sources:
   -
     type: conref-fs
@@ -60,13 +79,91 @@ data_sources:
       - :X
 ```
 
-Then, you can [construct a data folder filled with YAML files](https://github.com/gjtorikian/nanoc-conref-fs/tree/master/test/fixtures/data). These act as the source of your reusable content.
+The *./data/* folder should contain [yaml files](https://github.com/gjtorikian/nanoc-conref-fs/tree/master/test/fixtures/data) that organize your variables. These yaml files are the source of your reusable content. Nanoc Conref FS will use your file structure to organize the variables meaning your file names and layout will affect the variable names in the templates.
 
-Finally, you'll need some relevant keys added to your *nanoc.yaml* file.
+### Using Variables in Templates
+
+Now that you have variables defined in data files how do you use them? There are a couple ways variables are bound. The first and simpliest verison is often used for reusable content.
+
+As an example moving fowards lets say we have the following directory structure
+
+```
+data/
+  |-> reusables/
+  |   |-> names.yml
+  |-> Categories
+  |   |-> simple.yml 
+
+```
+
+For the first example lets use this sample content:
+
+*data/reusables/names.yml*
+
+```yaml
+first: 'Cory'
+last: 'Gwin'
+
+```
+
+Nanoc Conref FS exposes these simple variables to you using liquid. The variables will be bound to the `site.data` namespace. The variables will be name spaced to `site.data.foldername.filename.variable`.
+
+```html
+<p>{{ site.data.reusables.names.first }}</p>
+<p>{{ site.data.reusables.names.last }}</p>
+```
+
+You can also bind a more complex data_association to the page conditionally. This is often used for building navigation structures.
+
+Lets use this content:
+
+*data/categories/simple.yml*
+
+```yaml
+- Creating a new organization account:
+  - About organizations
+  - Creating a new organization from scratch
+- Create A Repo:
+  - Oh wow
+  - I am a child.
+```
+
+In the above structure `- Creating a new organization account:` will be a specific page in our navigation structure, with 2 children. We want to create a template that knows about the current pages sub-pages.
+
+The first step in getting this to work is to setup your page variables with a data association. We have not talked about page variable yet, but this is a method of binding more complex variables to specific pages.
+
+First we need to configure the page variables in *nanoc.yml*
+
+```yaml
+page_variables:
+  -
+    scope:
+      path: 'test-data'
+    values:
+      page_version: 'test association'
+      data_association: 'categories.simple'
+```
+ 
+Lets parse the above setting. `page_variable` is just a convention to start the page variable settings. `scope -> path` is the file path to apply these values to. `values` are variables to apply to the page. In the above example `page_version` will be exposed as a simple liquid tag, string. The `data_association` setting has special properties that we will now discuss.
+ 
+The data_association will use a combination of the `title` in the front matter and the yaml configs to determine a `children` and `parent` map to expose to your template via the `item`. Lets check it out.
+
+```html
+---
+title: Create A Repo <- used as the parent of the data_association
+intro: {{ site.data.reusables.names.first_name }} #<- will output Cory
+---
+<p><%= @item[:data_association] %> <- this is a string represenation of the data_association "categories.simple"</p>
+<p>
+  <%= @item[:children] %> <- ["Oh wow", "I am a child."] These are the children of the `Create Repo` category in categories/simple.yml
+</p>
+
+
+```
 
 ### Data folder variables
 
-The `data_variables` key applies additional/dynamic values to your data files, based on their path. For example, the following `data_variables` configuration adds a `version` attribute to every data file, whose value is `dotcom`:
+The `data_variables` key applies additional/dynamic values to your data files, based on their path, before the variables are applied to the page. For example, the following `data_variables` configuration adds a `version` attribute to every data file, whose value is `dotcom`:
 
  ``` yaml
  data_variables:
@@ -79,7 +176,7 @@ The `data_variables` key applies additional/dynamic values to your data files, b
 
  You could add to this key to indicate that any data file called *changed* instead has a version of `something_different`:
 
- ``` yaml
+```yaml
  data_variables:
    -
      scope:
@@ -135,12 +232,6 @@ In this case, every file path will get a `version` of `dotcom`, but any file mat
 
 See the tests for further usage of these conditionals. In both cases, `path` is converted into a Ruby regular expression before being matched against a filename.
 
-### Associating files with data
-
-If you have a special `data_association` value in your `scope`, additional metadata to items will be applied:
-
-* An attribute called `:parents`, which adds the parent "map topic" to an item.
-* An attribute called `:children`, which adds any children of a "map topic."
 
 ### Retrieving variables
 
