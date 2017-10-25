@@ -22,8 +22,11 @@ class DatafilesTest < MiniTest::Test
     result = NanocConrefFS::Datafiles.apply_conditionals(CONFIG, path: file, content: content, rep: :default)
     assert_includes result.to_s, 'No caveats!'
 
-    CONFIG[:data_variables][0][:values][:version] = 'foof'
-    result = NanocConrefFS::Datafiles.apply_conditionals(CONFIG, path: file, content: content, rep: :default)
+    # Don't modify the global constant, you break other tests.
+    config = YAML.load_file(File.join(FIXTURES_DIR, 'nanoc.yaml')).deep_symbolize_keys
+    config[:data_variables][0][:values][:version] = 'foof'
+
+    result = NanocConrefFS::Datafiles.apply_conditionals(config, path: file, content: content, rep: :default)
     assert_includes result.to_s, 'Well.....there is one.'
   end
 
