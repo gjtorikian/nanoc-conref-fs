@@ -107,7 +107,8 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     current_articles = flatten_list(current_articles).flatten
     current_articles = fix_nested_content(current_articles)
 
-    basic_yaml = NanocConrefFS::Variables.data_files["data/#{file.tr!('.', '/')}.yml"]
+    configured_data_path = 'data_jp' # TODO: Placeholder
+    basic_yaml = NanocConrefFS::Variables.data_files["#{configured_data_path}/#{file.tr!('.', '/')}.yml"]
     basic_yaml.gsub!(/\{%.+/, '')
     full_file = YAML.load(basic_yaml)
 
