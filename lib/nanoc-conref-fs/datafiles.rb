@@ -19,10 +19,8 @@ module NanocConrefFS
         raise "#{e.message}: #{e.inspect}"
       end
 
-      configured_data_path = config[:data_sources][0][:data_dir]
-
       path = path.dup
-      path.slice!("#{configured_data_path}/") # Beware the slashes, they are important for tokenization
+      path.slice!("#{ConrefFS.data_dir_name(config)}/") # Beware the slashes, they are important for tokenization
       path.sub!(/\.[yaml]{3,4}\z/, '')
       data_keys = path.split('/')
 

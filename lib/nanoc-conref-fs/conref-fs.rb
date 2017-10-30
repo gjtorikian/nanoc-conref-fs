@@ -102,13 +102,32 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     ParseResult.new(content: content, attributes: meta, attributes_data: pieces[2])
   end
 
+  # Some of the static class methods below (and elsewhere in the Gem) require 
+  # access to the `data_dir` value from the config. This need comes about
+  # *before* Nanoc has a chance to properly load up the configuration file,
+  # so we're doing a bare-bones load here to gain access to that configuration
+  # item.
+  #
+  # Parameters:
+  # - An optional already-loaded config, so that this can be used later in the
+  #   Nanoc pipeline.
+  #
+  # Returns:
+  # - Custom `data_dir` attribute from the 'conref-fs' data_source
+  # - Default `data_dir` of 'data' if none is configured in `nanoc.yaml`
+  def self.data_dir_name(config=nil)
+    config ||= YAML.load_file('nanoc.yaml')
+    data_sources = config.fetch("data_sources") { [] }
+    data_source = data_sources.find { |ds| ds["type"] == "conref-fs" } || { "data_dir": "data" }
+    return data_source["data_dir"] || "data"
+  end
+
   def self.create_ignore_rules(rep, file)
     current_articles = NanocConrefFS::Variables.fetch_data_file(file, rep)
     current_articles = flatten_list(current_articles).flatten
     current_articles = fix_nested_content(current_articles)
 
-    configured_data_path = 'data_jp' # TODO: Placeholder
-    basic_yaml = NanocConrefFS::Variables.data_files["#{configured_data_path}/#{file.tr!('.', '/')}.yml"]
+    basic_yaml = NanocConrefFS::Variables.data_files["#{data_dir_name}/#{file.tr!('.', '/')}.yml"]
     basic_yaml.gsub!(/\{%.+/, '')
     full_file = YAML.load(basic_yaml)
 
