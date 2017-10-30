@@ -2,6 +2,8 @@ require_relative 'conrefifier'
 require 'active_support/core_ext/string'
 
 class ConrefFS < Nanoc::DataSources::Filesystem
+  DEFAULT_DATA_DIR = "data".freeze
+
   include NanocConrefFS::Variables
   include NanocConrefFS::Ancestry
 
@@ -113,9 +115,13 @@ class ConrefFS < Nanoc::DataSources::Filesystem
   # - Default `data_dir` of 'data' if none is configured in `nanoc.yaml`
   def self.data_dir_name(config=nil)
     config ||= YAML.load_file('nanoc.yaml')
-    data_sources = config.fetch("data_sources") { [] }
-    data_source = data_sources.find { |ds| ds["type"] == "conref-fs" } || { "data_dir": "data" }
-    return data_source["data_dir"] || "data"
+    data_sources = config.fetch("data_sources") { nil }
+    return DEFAULT_DATA_DIR unless data_sources
+
+    data_source = data_sources.find { |ds| ds["type"] == "conref-fs" }
+    return DEFAULT_DATA_DIR unless data_source && data_source.has_key?("data_dir")
+
+    return data_source["data_dir"]
   end
 
   def self.create_ignore_rules(rep, file)
