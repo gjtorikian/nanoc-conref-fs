@@ -1,0 +1,4 @@
+{% if page.version != 'cloud' %}
+Custom Files:
+  - How to Use a Custom Data Directory
+{% endif %}

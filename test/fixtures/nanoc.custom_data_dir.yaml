@@ -1,0 +1,87 @@
+data_variables:
+  -
+    scope:
+      path: ""
+    values:
+      version: "dotcom"
+  -
+    scope:
+      path: ""
+      reps:
+        - :X
+    values:
+      version: "X"
+
+page_variables:
+  -
+    scope:
+      path: ""
+    values:
+      version: "dotcom"
+      data_association: "categories.category"
+      just_a_key: wow!
+  -
+    scope:
+      path: "array_parents"
+    values:
+      version: "dotcom"
+      data_association: "categories.simple"
+  -
+    scope:
+      path: "array_children"
+    values:
+      version: "dotcom"
+      data_association: "categories.simple"
+  -
+    scope:
+      path: "different"
+    values:
+      version: "2.0"
+  -
+    scope:
+      path: "empty-categories"
+    values:
+      version: "dotcom"
+      data_association: "categories.empty_category"
+      just_a_key: wow!
+  -
+    scope:
+      path: "multiple_versions"
+    values:
+      version: 2.2
+
+string_pattern_type: glob
+
+text_extensions: [ 'coffee', 'css', 'erb', 'haml', 'handlebars', 'hb', 'htm', 'html', 'js', 'less', 'markdown', 'md', 'ms', 'mustache', 'php', 'rb', 'rdoc', 'sass', 'scss', 'slim', 'txt', 'xhtml', 'xml' ]
+
+output_dir: output
+
+index_filenames: [ 'index.html' ]
+
+enable_output_diff: false
+
+prune:
+  auto_prune: true
+
+  exclude: [ '.git', '.hg', '.svn', 'CVS' ]
+
+data_sources:
+  -
+    # The type is the identifier of the data source.
+    type: conref-fs
+
+    data_dir: 'data_custom/'
+
+    items_root: /
+    layouts_root: /
+
+    encoding: utf-8
+
+    identifier_type: full
+    reps:
+      - :default
+      - :X
+
+checks:
+  internal_links:
+    exclude: []

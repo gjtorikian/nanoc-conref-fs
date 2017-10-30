@@ -45,4 +45,12 @@ class DatafilesTest < MiniTest::Test
     assert_includes result.to_s, 'About gists'
     refute_includes result.to_s, 'Deleting an anonymous gist'
   end
+
+  def test_it_can_use_a_custom_datafile
+    file = File.join(FIXTURES_DIR, 'data_custom', 'categories', 'custom.yml')
+    content = File.read(file)
+    config = YAML.load_file(File.join(FIXTURES_DIR, 'nanoc.custom_data_dir.yaml')).deep_symbolize_keys
+    result = NanocConrefFS::Datafiles.apply_conditionals(config, path: file, content: content, rep: :default)
+    assert_includes result.to_s, 'How to Use a Custom Data Directory'
+  end
 end
