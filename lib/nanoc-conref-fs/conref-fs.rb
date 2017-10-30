@@ -10,15 +10,11 @@ class ConrefFS < Nanoc::DataSources::Filesystem
   # Before iterating over the file objects, this method loads the data folder
   # and applies it to an ivar for later usage.
   def up
-    data_files = NanocConrefFS::Datafiles.collect_data(data_dir_name)
+    data_files = NanocConrefFS::Datafiles.collect_data(ConrefFS.data_dir_name(config))
     NanocConrefFS::Variables.data_files = data_files
     NanocConrefFS::Variables.variables = {}
     reps = @config[:reps] || [:default]
     reps.each { |rep| ConrefFS.load_data_folder(@site_config, rep) }
-  end
-
-  def data_dir_name
-    config.fetch(:data_dir) { |_| 'data' }
   end
 
   def self.load_data_folder(config, rep)
