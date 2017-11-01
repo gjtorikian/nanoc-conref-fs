@@ -23,7 +23,7 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     return unless NanocConrefFS::Variables.variables[rep].nil?
     data_files = NanocConrefFS::Variables.data_files
     data = NanocConrefFS::Datafiles.process(data_files, config, rep)
-    NanocConrefFS::Variables.variables[rep] = { 'site' => { 'config' => config, 'data' => data } }
+    NanocConrefFS::Variables.variables[rep] = { 'site' => { 'config' => config, data_dir_name => data } }
   end
 
   def self.apply_attributes(config, item, rep)
@@ -115,13 +115,23 @@ class ConrefFS < Nanoc::DataSources::Filesystem
   # - Default `data_dir` of 'data' if none is configured in `nanoc.yaml`
   def self.data_dir_name(config=nil)
     config ||= YAML.load_file('nanoc.yaml')
+
+    # In certain parts of the nanoc pipeline the config is rooted at the
+    # data-source already.
+    data_dir = config.fetch(:data_dir) { nil }
+    return data_dir if data_dir
+
     data_sources = config.fetch("data_sources") { nil }
+    data_sources = config.fetch(:data_sources) { nil } unless data_sources
     return DEFAULT_DATA_DIR unless data_sources
 
     data_source = data_sources.find { |ds| ds["type"] == "conref-fs" }
-    return DEFAULT_DATA_DIR unless data_source && data_source.has_key?("data_dir")
+    data_source = data_sources.find { |ds| ds[:type] == "conref-fs" } unless data_source
 
-    return data_source["data_dir"]
+    data_dir = data_source.fetch("data_dir") { nil }
+    data_dir = data_source.fetch(:data_dir) unless data_dir
+    return DEFAULT_DATA_DIR unless data_dir
+    return data_dir
   end
 
   def self.create_ignore_rules(rep, file)
@@ -129,7 +139,9 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     current_articles = flatten_list(current_articles).flatten
     current_articles = fix_nested_content(current_articles)
 
-    basic_yaml = NanocConrefFS::Variables.data_files["#{data_dir_name}/#{file.tr!('.', '/')}.yml"]
+    basic_yaml_path = "#{data_dir_name}/#{file.tr!('.', '/')}.yml"
+    basic_yaml = NanocConrefFS::Variables.data_files[basic_yaml_path]
+    raise "Could not locate #{basic_yaml_path} in the data files." unless basic_yaml
     basic_yaml.gsub!(/\{%.+/, '')
     full_file = YAML.load(basic_yaml)
 

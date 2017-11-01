@@ -20,9 +20,13 @@ module NanocConrefFS
     def self.fetch_data_file(association, rep)
       return nil unless association
       reference = association.split('.')
-      data = @variables[rep]['site']['data']
+      data = @variables[rep]['site'][ConrefFS.data_dir_name]
       while key = reference.shift
-        data = data[key]
+        begin
+          data = data[key]
+        rescue Exception => ex
+          raise "Unable to locate #{key} in #{@variables[rep]['site'].inspect}"
+        end
       end
       data
     end
