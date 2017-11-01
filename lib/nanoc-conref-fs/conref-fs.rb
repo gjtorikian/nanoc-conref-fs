@@ -1,4 +1,5 @@
 require_relative 'conrefifier'
+require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
 
 class ConrefFS < Nanoc::DataSources::Filesystem
@@ -115,6 +116,7 @@ class ConrefFS < Nanoc::DataSources::Filesystem
   # - Default `data_dir` of 'data' if none is configured in `nanoc.yaml`
   def self.data_dir_name(config=nil)
     config ||= YAML.load_file('nanoc.yaml')
+    config = config.to_h.with_indifferent_access()
 
     # In certain parts of the nanoc pipeline the config is rooted at the
     # data-source already.
@@ -122,14 +124,11 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     return data_dir if data_dir
 
     data_sources = config.fetch("data_sources") { nil }
-    data_sources = config.fetch(:data_sources) { nil } unless data_sources
     return DEFAULT_DATA_DIR unless data_sources
 
     data_source = data_sources.find { |ds| ds["type"] == "conref-fs" }
-    data_source = data_sources.find { |ds| ds[:type] == "conref-fs" } unless data_source
 
     data_dir = data_source.fetch("data_dir") { nil }
-    data_dir = data_source.fetch(:data_dir) unless data_dir
     return DEFAULT_DATA_DIR unless data_dir
     return data_dir
   end
