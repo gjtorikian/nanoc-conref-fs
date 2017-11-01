@@ -120,7 +120,7 @@ class ConrefFS < Nanoc::DataSources::Filesystem
 
     # In certain parts of the nanoc pipeline the config is rooted at the
     # data-source already.
-    data_dir = config.fetch(:data_dir) { nil }
+    data_dir = config.fetch("data_dir") { nil }
     return data_dir if data_dir
 
     data_sources = config.fetch("data_sources") { nil }
