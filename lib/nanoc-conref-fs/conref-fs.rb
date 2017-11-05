@@ -1,7 +1,10 @@
 require_relative 'conrefifier'
+require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
 
 class ConrefFS < Nanoc::DataSources::Filesystem
+  DEFAULT_DATA_DIR = "data".freeze
+
   include NanocConrefFS::Variables
   include NanocConrefFS::Ancestry
 
@@ -10,22 +13,18 @@ class ConrefFS < Nanoc::DataSources::Filesystem
   # Before iterating over the file objects, this method loads the data folder
   # and applies it to an ivar for later usage.
   def up
-    data_files = NanocConrefFS::Datafiles.collect_data(data_dir_name)
+    data_files = NanocConrefFS::Datafiles.collect_data(ConrefFS.data_dir_name(config))
     NanocConrefFS::Variables.data_files = data_files
     NanocConrefFS::Variables.variables = {}
     reps = @config[:reps] || [:default]
     reps.each { |rep| ConrefFS.load_data_folder(@site_config, rep) }
   end
 
-  def data_dir_name
-    config.fetch(:data_dir) { |_| 'data' }
-  end
-
   def self.load_data_folder(config, rep)
     return unless NanocConrefFS::Variables.variables[rep].nil?
     data_files = NanocConrefFS::Variables.data_files
     data = NanocConrefFS::Datafiles.process(data_files, config, rep)
-    NanocConrefFS::Variables.variables[rep] = { 'site' => { 'config' => config, 'data' => data } }
+    NanocConrefFS::Variables.variables[rep] = { 'site' => { 'config' => config, data_dir_name => data } }
   end
 
   def self.apply_attributes(config, item, rep)
@@ -102,12 +101,46 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     ParseResult.new(content: content, attributes: meta, attributes_data: pieces[2])
   end
 
+  # Some of the static class methods below (and elsewhere in the Gem) require 
+  # access to the `data_dir` value from the config. This need comes about
+  # *before* Nanoc has a chance to properly load up the configuration file,
+  # so we're doing a bare-bones load here to gain access to that configuration
+  # item.
+  #
+  # Parameters:
+  # - An optional already-loaded config, so that this can be used later in the
+  #   Nanoc pipeline.
+  #
+  # Returns:
+  # - Custom `data_dir` attribute from the 'conref-fs' data_source
+  # - Default `data_dir` of 'data' if none is configured in `nanoc.yaml`
+  def self.data_dir_name(config=nil)
+    config ||= YAML.load_file('nanoc.yaml')
+    config = config.to_h.with_indifferent_access()
+
+    # In certain parts of the nanoc pipeline the config is rooted at the
+    # data-source already.
+    data_dir = config.fetch("data_dir") { nil }
+    return data_dir if data_dir
+
+    data_sources = config.fetch("data_sources") { nil }
+    return DEFAULT_DATA_DIR unless data_sources
+
+    data_source = data_sources.find { |ds| ds["type"] == "conref-fs" }
+
+    data_dir = data_source.fetch("data_dir") { nil }
+    return DEFAULT_DATA_DIR unless data_dir
+    return data_dir
+  end
+
   def self.create_ignore_rules(rep, file)
     current_articles = NanocConrefFS::Variables.fetch_data_file(file, rep)
     current_articles = flatten_list(current_articles).flatten
     current_articles = fix_nested_content(current_articles)
 
-    basic_yaml = NanocConrefFS::Variables.data_files["data/#{file.tr!('.', '/')}.yml"]
+    basic_yaml_path = "#{data_dir_name}/#{file.tr!('.', '/')}.yml"
+    basic_yaml = NanocConrefFS::Variables.data_files[basic_yaml_path]
+    raise "Could not locate #{basic_yaml_path} in the data files." unless basic_yaml
     basic_yaml.gsub!(/\{%.+/, '')
     full_file = YAML.load(basic_yaml)
 

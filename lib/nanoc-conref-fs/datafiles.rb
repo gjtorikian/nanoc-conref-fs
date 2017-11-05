@@ -20,7 +20,7 @@ module NanocConrefFS
       end
 
       path = path.dup
-      path.slice!('data/')
+      path.slice!("#{ConrefFS.data_dir_name(config)}/") # Beware the slashes, they are important for tokenization
       path.sub!(/\.[yaml]{3,4}\z/, '')
       data_keys = path.split('/')
 
