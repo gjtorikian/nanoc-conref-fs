@@ -12,3 +12,8 @@ cache: bundler
 
 git:
   depth: 10
+
+matrix:
+  include:
+    - script: bundle exec rake rubocop
+      rvm: 2.5.0
