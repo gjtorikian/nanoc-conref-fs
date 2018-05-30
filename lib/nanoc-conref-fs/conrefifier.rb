@@ -32,7 +32,7 @@ module NanocConrefFS
 
     def self.liquify(config, path:, content:, rep:)
       page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], path, rep)
-      page_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
+      page_vars = { page: page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 
       # we must obfuscate essential ExtendedMarkdownFilter content
       content = content.gsub(/\{\{\s*#(\S+)\s*\}\}/, '[[#\1]]')
@@ -62,7 +62,7 @@ module NanocConrefFS
 
     def self.apply_liquid(content, data_vars)
       data_vars['page'] = data_vars[:page].stringify_keys
-      result = Liquid::Template.parse(content, :error_mode => :warn).render(data_vars)
+      result = Liquid::Template.parse(content, error_mode: :warn).render(data_vars)
       # This second pass renders any previously inserted
       # data conditionals within the body. If a Liquid parse
       # returns a blank string, we'll return the original

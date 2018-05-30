@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = 'nanoc-conref-fs'
-  spec.version       = '0.6.10'
+  spec.version       = '0.7.0'
   spec.authors       = ['Garen Torikian']
   spec.email         = ['gjtorikian@gmail.com']
   spec.summary       = 'A Nanoc filesystem to permit using conrefs/reusables in your content.'
@@ -15,11 +15,15 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test)/})
   spec.require_paths = ['lib']
 
-  spec.add_runtime_dependency 'nanoc', '~> 4.3'
   spec.add_runtime_dependency 'activesupport', '~> 4.2'
   spec.add_runtime_dependency 'liquid', '~> 4.0'
+  spec.add_runtime_dependency 'nanoc', '~> 4.9'
 
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'minitest', '~> 5.8'
   spec.add_development_dependency 'awesome_print'
+  spec.add_development_dependency 'minitest', '~> 5.8'
+  spec.add_development_dependency 'minitest-focus', '~> 1.1'
+  spec.add_development_dependency 'pry', '~> 0.10.0'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rubocop'
+  spec.add_development_dependency 'rubocop-github'
 end

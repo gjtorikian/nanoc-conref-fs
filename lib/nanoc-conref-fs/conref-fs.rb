@@ -2,8 +2,21 @@ require_relative 'conrefifier'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
 
+class Nanoc::DataSources::Filesystem::Parser
+  alias_method :old_parse_metadata, :parse_metadata
+  # There are a lot of problems when trying to parse liquid
+  # out of the frontmatter—all of them dealing with collision between
+  # the { character in Liquid and its signfigance in YAML. We'll overload
+  # the parse method here to resolve those issues ahead of time.
+  def parse_metadata(data, filename)
+    wrapped_data = data.gsub(/^([^:]+): (\{\{.+)/, '\1: \'\2\'')
+
+    old_parse_metadata(wrapped_data, filename)
+  end
+end
+
 class ConrefFS < Nanoc::DataSources::Filesystem
-  DEFAULT_DATA_DIR = "data".freeze
+  DEFAULT_DATA_DIR = 'data'.freeze
 
   include NanocConrefFS::Variables
   include NanocConrefFS::Ancestry
@@ -29,7 +42,7 @@ class ConrefFS < Nanoc::DataSources::Filesystem
 
   def self.apply_attributes(config, item, rep)
     page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename], rep)
-    frontmatter_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
+    frontmatter_vars = { page: page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
@@ -64,44 +77,7 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     end
   end
 
-  # There are a lot of problems when trying to parse liquid
-  # out of the frontmatter—all of them dealing with collision between
-  # the { character in Liquid and its signfigance in YAML. We'll overload
-  # the parse method here to resolve those issues ahead of time.
-  def parse_with_frontmatter(content_filename)
-    # Read data
-    data = read(content_filename)
-
-    # Check presence of metadata section
-    if data !~ /\A-{3,5}\s*$/
-      return ParseResult.new(content: data, attributes: {}, attributes_data: '')
-    end
-
-    # Split data
-    pieces = data.split(/^(-{5}|-{3})[ \t]*\r?\n?/, 3)
-    if pieces.size < 4
-      raise RuntimeError.new(
-        "The file '#{content_filename}' appears to start with a metadata section (three or five dashes at the top) but it does not seem to be in the correct format.",
-      )
-    end
-
-    # N.B. the only change to the original function
-    pieces[2].gsub!(/^([^:]+): (\{\{.+)/, '\1: \'\2\'')
-
-    # Parse
-    begin
-      meta = YAML.load(pieces[2]) || {}
-    rescue Exception => e
-      raise "Could not parse YAML for #{content_filename}: #{e.message}"
-    end
-    verify_meta(meta, content_filename)
-    content = pieces[4]
-
-    # Done
-    ParseResult.new(content: content, attributes: meta, attributes_data: pieces[2])
-  end
-
-  # Some of the static class methods below (and elsewhere in the Gem) require 
+  # Some of the static class methods below (and elsewhere in the Gem) require
   # access to the `data_dir` value from the config. This need comes about
   # *before* Nanoc has a chance to properly load up the configuration file,
   # so we're doing a bare-bones load here to gain access to that configuration
@@ -114,21 +90,21 @@ class ConrefFS < Nanoc::DataSources::Filesystem
   # Returns:
   # - Custom `data_dir` attribute from the 'conref-fs' data_source
   # - Default `data_dir` of 'data' if none is configured in `nanoc.yaml`
-  def self.data_dir_name(config=nil)
+  def self.data_dir_name(config = nil)
     config ||= YAML.load_file('nanoc.yaml')
-    config = config.to_h.with_indifferent_access()
+    config = config.to_h.with_indifferent_access
 
     # In certain parts of the nanoc pipeline the config is rooted at the
     # data-source already.
-    data_dir = config.fetch("data_dir") { nil }
+    data_dir = config.fetch('data_dir') { nil }
     return data_dir if data_dir
 
-    data_sources = config.fetch("data_sources") { nil }
+    data_sources = config.fetch('data_sources') { nil }
     return DEFAULT_DATA_DIR unless data_sources
 
-    data_source = data_sources.find { |ds| ds["type"] == "conref-fs" }
+    data_source = data_sources.find { |ds| ds['type'] == 'conref-fs' }
 
-    data_dir = data_source.fetch("data_dir") { nil }
+    data_dir = data_source.fetch('data_dir') { nil }
     return DEFAULT_DATA_DIR unless data_dir
     return data_dir
   end
