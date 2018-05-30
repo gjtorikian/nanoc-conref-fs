@@ -2,6 +2,19 @@ require_relative 'conrefifier'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
 
+class Nanoc::DataSources::Filesystem::Parser
+  alias_method :old_parse_metadata, :parse_metadata
+  # There are a lot of problems when trying to parse liquid
+  # out of the frontmatter—all of them dealing with collision between
+  # the { character in Liquid and its signfigance in YAML. We'll overload
+  # the parse method here to resolve those issues ahead of time.
+  def parse_metadata(data, filename)
+    wrapped_data = data.gsub(/^([^:]+): (\{\{.+)/, '\1: \'\2\'')
+
+    old_parse_metadata(wrapped_data, filename)
+  end
+end
+
 class ConrefFS < Nanoc::DataSources::Filesystem
   DEFAULT_DATA_DIR = 'data'.freeze
 
@@ -62,43 +75,6 @@ class ConrefFS < Nanoc::DataSources::Filesystem
         end
       end
     end
-  end
-
-  # There are a lot of problems when trying to parse liquid
-  # out of the frontmatter—all of them dealing with collision between
-  # the { character in Liquid and its signfigance in YAML. We'll overload
-  # the parse method here to resolve those issues ahead of time.
-  def parse_with_frontmatter(content_filename)
-    # Read data
-    data = read(content_filename)
-
-    # Check presence of metadata section
-    if data !~ /\A-{3,5}\s*$/
-      return ParseResult.new(content: data, attributes: {}, attributes_data: '')
-    end
-
-    # Split data
-    pieces = data.split(/^(-{5}|-{3})[ \t]*\r?\n?/, 3)
-    if pieces.size < 4
-      raise RuntimeError.new(
-        "The file '#{content_filename}' appears to start with a metadata section (three or five dashes at the top) but it does not seem to be in the correct format.",
-      )
-    end
-
-    # N.B. the only change to the original function
-    pieces[2].gsub!(/^([^:]+): (\{\{.+)/, '\1: \'\2\'')
-
-    # Parse
-    begin
-      meta = YAML.load(pieces[2]) || {}
-    rescue StandardError => e
-      raise "Could not parse YAML for #{content_filename}: #{e.message}"
-    end
-    verify_meta(meta, content_filename)
-    content = pieces[4]
-
-    # Done
-    ParseResult.new(content: content, attributes: meta, attributes_data: pieces[2])
   end
 
   # Some of the static class methods below (and elsewhere in the Gem) require
