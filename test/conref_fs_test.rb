@@ -42,16 +42,6 @@ class DatafilesTest < MiniTest::Test
     end
   end
 
-  def test_it_renders_nested_conrefs
-    with_site do |site|
-      site.compile
-
-      output_file = read_output_file('datafiles', 'deep')
-      test_file = read_test_file('datafiles', 'deep')
-      assert_equal output_file, test_file
-    end
-  end
-
   def test_it_applies_any_attribute
     with_site do |site|
       site.compile
