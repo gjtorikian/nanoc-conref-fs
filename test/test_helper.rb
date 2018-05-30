@@ -6,6 +6,7 @@ require 'nanoc'
 require_relative '../lib/nanoc-conref-fs'
 require 'minitest/autorun'
 require 'minitest/pride'
+require 'minitest/focus'
 require 'active_support'
 
 FIXTURES_DIR = File.join(Dir.pwd, 'test', 'fixtures')
