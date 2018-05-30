@@ -9,7 +9,7 @@ module NanocConrefFS
 
     def self.apply_conditionals(config, path:, content:, rep:)
       vars = Conrefifier.file_variables(config[:data_variables], path, rep)
-      data_vars = { :page => vars, :site => { :config => config } }
+      data_vars = { page: vars, site: { config: config } }
 
       content = obfuscate_and_liquify(content, data_vars)
       begin

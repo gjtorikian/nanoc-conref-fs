@@ -24,7 +24,7 @@ module NanocConrefFS
       while key = reference.shift
         begin
           data = data[key]
-        rescue Exception => ex
+        rescue StandardError => ex
           raise "Unable to locate #{key} in #{@variables[rep]['site'].inspect}"
         end
       end

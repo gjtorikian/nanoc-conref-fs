@@ -3,7 +3,7 @@ require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
 
 class ConrefFS < Nanoc::DataSources::Filesystem
-  DEFAULT_DATA_DIR = "data".freeze
+  DEFAULT_DATA_DIR = 'data'.freeze
 
   include NanocConrefFS::Variables
   include NanocConrefFS::Ancestry
@@ -29,7 +29,7 @@ class ConrefFS < Nanoc::DataSources::Filesystem
 
   def self.apply_attributes(config, item, rep)
     page_vars = NanocConrefFS::Conrefifier.file_variables(config[:page_variables], item[:filename], rep)
-    frontmatter_vars = { :page => page_vars }.merge(NanocConrefFS::Variables.variables[rep])
+    frontmatter_vars = { page: page_vars }.merge(NanocConrefFS::Variables.variables[rep])
 
     unless page_vars[:data_association].nil?
       association = page_vars[:data_association]
@@ -91,7 +91,7 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     # Parse
     begin
       meta = YAML.load(pieces[2]) || {}
-    rescue Exception => e
+    rescue StandardError => e
       raise "Could not parse YAML for #{content_filename}: #{e.message}"
     end
     verify_meta(meta, content_filename)
@@ -101,7 +101,7 @@ class ConrefFS < Nanoc::DataSources::Filesystem
     ParseResult.new(content: content, attributes: meta, attributes_data: pieces[2])
   end
 
-  # Some of the static class methods below (and elsewhere in the Gem) require 
+  # Some of the static class methods below (and elsewhere in the Gem) require
   # access to the `data_dir` value from the config. This need comes about
   # *before* Nanoc has a chance to properly load up the configuration file,
   # so we're doing a bare-bones load here to gain access to that configuration
@@ -114,21 +114,21 @@ class ConrefFS < Nanoc::DataSources::Filesystem
   # Returns:
   # - Custom `data_dir` attribute from the 'conref-fs' data_source
   # - Default `data_dir` of 'data' if none is configured in `nanoc.yaml`
-  def self.data_dir_name(config=nil)
+  def self.data_dir_name(config = nil)
     config ||= YAML.load_file('nanoc.yaml')
-    config = config.to_h.with_indifferent_access()
+    config = config.to_h.with_indifferent_access
 
     # In certain parts of the nanoc pipeline the config is rooted at the
     # data-source already.
-    data_dir = config.fetch("data_dir") { nil }
+    data_dir = config.fetch('data_dir') { nil }
     return data_dir if data_dir
 
-    data_sources = config.fetch("data_sources") { nil }
+    data_sources = config.fetch('data_sources') { nil }
     return DEFAULT_DATA_DIR unless data_sources
 
-    data_source = data_sources.find { |ds| ds["type"] == "conref-fs" }
+    data_source = data_sources.find { |ds| ds['type'] == 'conref-fs' }
 
-    data_dir = data_source.fetch("data_dir") { nil }
+    data_dir = data_source.fetch('data_dir') { nil }
     return DEFAULT_DATA_DIR unless data_dir
     return data_dir
   end

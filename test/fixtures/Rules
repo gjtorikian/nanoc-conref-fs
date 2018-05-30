@@ -21,7 +21,7 @@ compile '/**/*.md' do
   end
 end
 
-compile '/multiple/single_var.md', :rep => :X do
+compile '/multiple/single_var.md', rep: :X do
   filter :'conref-fs-filter'
   filter :erb
   layout '/default.*'
@@ -31,7 +31,7 @@ route '/**/*.md' do
   item.identifier.without_ext + '/index.html'
 end
 
-route '/multiple/single_var.md', :rep => :X do
+route '/multiple/single_var.md', rep: :X do
   item.identifier.without_ext + '_x/index.html'
 end
 
